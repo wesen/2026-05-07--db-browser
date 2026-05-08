@@ -855,3 +855,77 @@ Successful smoke excerpts:
 }
 ]
 ```
+
+## Step 11: Record commit checkpoints and full-test status
+
+After completing T01 through T05, I recorded the focused commit hashes and ran the full Go test suite. This step is a documentation checkpoint before moving on to the UI DSL and web-host tasks.
+
+### Prompt Context
+
+**User prompt (verbatim):** (same as Step 6)
+
+**Assistant interpretation:** Keep the diary current with commit evidence and validation status after the first batch of implementation tasks.
+
+**Inferred user intent:** Make it easy to review or resume the work from known-good commits.
+
+**Commit (code):** documentation checkpoint only.
+
+### What I did
+
+- Committed T01 ticket planning docs:
+  - `f9ce54db2a91363cf2c0939aa50e28fd5477e124` — `Document DB browser implementation tasks`
+- Committed T02 CLI skeleton:
+  - `a86af1d95a282519aa8a07d4dbed97037de49b58` — `Add db-browser CLI skeleton`
+- Committed T03 repository bootstrap:
+  - `103c9f7dcf8cfcf3b698be0410f959a6cf0869b6` — `Add verb repository bootstrap`
+- Committed T04 jsverbs CLI mounting:
+  - `084b7a63feb560ffe0f2ad95ebbf6853fd346c8d` — `Mount repository jsverbs CLI`
+- Committed T05 runtime module profile:
+  - `80568ca6831207a1f86d27fef5ce2f9c92765502` — `Execute verbs with yaml and database modules`
+- Ran `go test ./...`.
+
+### Why
+
+- The user requested commits at appropriate intervals and a detailed diary.
+- Recording hashes in the diary gives reviewers stable anchors for each completed task.
+
+### What worked
+
+- Full test suite passed:
+  - `? github.com/go-go-golems/db-browser/cmd/db-browser [no test files]`
+  - `ok github.com/go-go-golems/db-browser/internal/verbcli`
+  - `ok github.com/go-go-golems/db-browser/internal/verbrepos`
+
+### What didn't work
+
+- N/A for this checkpoint.
+
+### What I learned
+
+- The first implementation slice is now a working CLI/jsverbs/runtime foundation. The next distinct layer is UI rendering (`ui.dsl`) rather than more repository plumbing.
+
+### What was tricky to build
+
+- The most important sharp edge so far was the lazy command flag lifecycle; it is documented in Step 10.
+
+### What warrants a second pair of eyes
+
+- Review the local DB module implementation in `internal/verbcli/runtime.go`, especially write gating and value normalization.
+- Review whether Go 1.26.1 in `go.mod` is acceptable, since `go-go-goja v0.4.14` caused the upgrade.
+
+### What should be done in the future
+
+- Start T06: minimal `ui.dsl` package and renderer tests.
+
+### Code review instructions
+
+- Review commits in order from `f9ce54d` through `80568ca`.
+- Run `go test ./...` and `ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/005-runtime-smoke.sh`.
+
+### Technical details
+
+Current clean validation command:
+
+```bash
+go test ./...
+```

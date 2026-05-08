@@ -100,3 +100,12 @@ Added CLI verb runtime profile with yaml and configured SQLite db aliases.
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 10
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/005-runtime-smoke.sh — Runtime validation script
 
+
+## 2026-05-07
+
+Recorded commit checkpoints for completed T01-T05 implementation tasks.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Commit checkpoint diary step
+
