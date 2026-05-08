@@ -1,13 +1,11 @@
 package verbcli
 
 import (
-	"context"
 	"fmt"
 	"sort"
 
 	glazedcli "github.com/go-go-golems/glazed/pkg/cli"
 	"github.com/go-go-golems/glazed/pkg/cmds"
-	"github.com/go-go-golems/glazed/pkg/cmds/values"
 	"github.com/go-go-golems/go-go-goja/pkg/jsverbs"
 	"github.com/spf13/cobra"
 
@@ -49,13 +47,31 @@ func NewLazyCommand() *cobra.Command {
 }
 
 func NewCommand(bootstrap verbrepos.Bootstrap) (*cobra.Command, error) {
-	return newCommandWithInvokerFactory(bootstrap, notYetImplementedInvokerFactory)
+	settings := &RuntimeSettings{ReadOnly: true}
+	return newCommandWithInvokerFactory(bootstrap, runtimeInvokerFactory(settings), settings)
 }
 
-func newCommandWithInvokerFactory(bootstrap verbrepos.Bootstrap, invokers InvokerFactory) (*cobra.Command, error) {
+func newCommandWithInvokerFactory(bootstrap verbrepos.Bootstrap, invokers InvokerFactory, settings *RuntimeSettings) (*cobra.Command, error) {
 	root := &cobra.Command{
 		Use:   "verbs",
 		Short: "Run repository-scanned JavaScript verbs",
+	}
+	if settings != nil {
+		root.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
+			if flag := cmd.Flag("db"); flag != nil {
+				settings.DBPath = flag.Value.String()
+			}
+			if flag := cmd.Flag("readonly"); flag != nil {
+				settings.ReadOnly = flag.Value.String() != "false"
+			}
+			if flag := cmd.Flag("allow-writes"); flag != nil {
+				settings.AllowWrites = flag.Value.String() == "true"
+			}
+			return nil
+		}
+		root.PersistentFlags().StringVar(&settings.DBPath, "db", "", "SQLite database path exposed as require(\"database\") and require(\"db\")")
+		root.PersistentFlags().BoolVar(&settings.ReadOnly, "readonly", true, "Open the JavaScript database API in read-only mode")
+		root.PersistentFlags().BoolVar(&settings.AllowWrites, "allow-writes", false, "Allow db.exec writes when --readonly=false")
 	}
 
 	repositories, err := ScanRepositories(bootstrap)
@@ -137,12 +153,6 @@ func buildCommands(discovered []DiscoveredVerb, invokers InvokerFactory) ([]cmds
 		commands = append(commands, cmd)
 	}
 	return commands, nil
-}
-
-func notYetImplementedInvokerFactory(repo ScannedRepository, _ *jsverbs.VerbSpec) jsverbs.VerbInvoker {
-	return func(ctx context.Context, registry *jsverbs.Registry, verb *jsverbs.VerbSpec, parsedValues *values.Values) (interface{}, error) {
-		return nil, fmt.Errorf("runtime execution is not implemented yet for %s from %s", verb.FullPath(), describeRepository(repo))
-	}
 }
 
 func discoveredVerbSource(verb DiscoveredVerb) string {

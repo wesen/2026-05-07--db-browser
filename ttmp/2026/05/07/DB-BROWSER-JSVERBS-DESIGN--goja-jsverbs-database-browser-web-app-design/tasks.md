@@ -40,13 +40,13 @@
 
 ### T05 — Runtime module profile for CLI verbs
 
-- [ ] Build a runtime factory for a scanned repository using `registry.RequireLoader()`.
-- [ ] Add repository root, repository `node_modules`, parent, and parent `node_modules` require roots.
-- [ ] Enable `fs`, `path`, `time`, `timer`, and `yaml` through default go-go-goja modules.
-- [ ] Add `database` and `db` aliases when `--db` is provided.
-- [ ] Add `--db`, `--readonly`, and `--allow-writes` runtime flags.
-- [ ] Execute a fixture verb that imports `yaml` and optionally `database`.
-- [ ] Commit runtime module profile.
+- [x] Build a runtime factory for a scanned repository using `registry.RequireLoader()`.
+- [x] Add repository root, repository `node_modules`, parent, and parent `node_modules` require roots.
+- [x] Enable `fs`, `path`, `time`, `timer`, and `yaml` through default go-go-goja modules.
+- [x] Add `database` and `db` aliases when `--db` is provided.
+- [x] Add `--db`, `--readonly`, and `--allow-writes` runtime flags.
+- [x] Execute a fixture verb that imports `yaml` and optionally `database`.
+- [x] Commit runtime module profile.
 
 ### T06 — Minimal UI DSL package
 

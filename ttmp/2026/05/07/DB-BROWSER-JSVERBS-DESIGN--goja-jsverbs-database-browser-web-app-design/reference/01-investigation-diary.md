@@ -756,3 +756,102 @@ ok  	github.com/go-go-golems/db-browser/internal/verbcli
 ?   	github.com/go-go-golems/db-browser/cmd/db-browser	[no test files]
 examples builtin hello	builtin	hello.js	hello	glaze
 ```
+
+## Step 10: Add runtime module profile for CLI verbs
+
+I replaced the temporary not-implemented invoker with a real Goja runtime path for CLI verbs. The runtime uses the scanned-source require loader, repository module roots, selected default modules including `yaml`, and configured SQLite `database`/`db` aliases when `--db` is provided.
+
+### Prompt Context
+
+**User prompt (verbatim):** (same as Step 6)
+
+**Assistant interpretation:** Continue into T05 by making discovered JS verbs executable with yaml and database modules, then validate through ticket-local smoke scripts.
+
+**Inferred user intent:** Prove that repository-scanned JavaScript can actually run inside the host module profile before moving to UI/web work.
+
+**Commit (code):** pending — runtime module profile.
+
+### What I did
+
+- Added `internal/verbcli/runtime.go`.
+- Added `RuntimeSettings` with `--db`, `--readonly`, and `--allow-writes` flags on the resolved `verbs` root.
+- Built Goja runtimes with:
+  - `registry.RequireLoader()`;
+  - repository root and `node_modules` require roots;
+  - parent directory and parent `node_modules` require roots;
+  - default modules: `fs`, `path`, `time`, `timer`, and `yaml`;
+  - custom configured `database` and `db` native modules when `--db` is set.
+- Added `internal/verbrepos/builtin/yaml.js` fixture verb.
+- Added `internal/verbrepos/builtin/db.js` fixture verb.
+- Added `scripts/005-runtime-smoke.sh` to validate tests, YAML execution, and SQLite table listing.
+- Ran `scripts/005-runtime-smoke.sh` successfully.
+
+### Why
+
+- The DB browser needs repository-scanned verbs to run against host-provided modules.
+- YAML was explicitly requested for validation, and SQLite DB access is the core domain feature.
+
+### What worked
+
+- YAML smoke passed:
+  - `go run ./cmd/db-browser verbs examples builtin yaml-keys --text $'alpha: 1\nbeta: 2' --output json`
+  - Output included keys `alpha` and `beta`.
+- DB smoke passed:
+  - Created a temporary SQLite DB with Python.
+  - Ran `go run ./cmd/db-browser verbs --db "$DB_PATH" examples builtin tables --output json`.
+  - Output included table `users`.
+
+### What didn't work
+
+- The first DB smoke failed with:
+
+```text
+Error: GoError: Invalid module at github.com/dop251/goja_nodejs/require.(*RequireModule).require-fm (native)
+```
+
+- Root cause: the resolved dynamic command did not reliably copy persistent flag values into the shared runtime settings before the invoker built the runtime. The runtime therefore did not register `db`, and `require("db")` failed.
+- Fix: added a `PersistentPreRunE` on the resolved `verbs` root to copy `db`, `readonly`, and `allow-writes` flag values into the `RuntimeSettings` pointer before command execution.
+- I also replaced the initial `databasemod` wiring with a small local `dbModuleLoader` so the current CLI runtime owns only the minimal `query`/`exec` API needed for this app.
+
+### What I learned
+
+- With lazy dynamic commands, it is not enough to bind persistent flags once; the invoker must see values after Cobra has parsed the resolved command tree.
+- A small local DB module is easier to reason about while building the first CLI path. We can switch back to `go-go-goja/modules/database` later if we want its exact API and TypeScript declarations.
+
+### What was tricky to build
+
+- The flag lifecycle was the sharp edge. The outer `verbs` command disables flag parsing for bootstrap, then the resolved command parses the remaining args. The runtime settings pointer must be updated during the resolved command's execution lifecycle, not during bootstrap.
+
+### What warrants a second pair of eyes
+
+- Review the local `dbModuleLoader` and decide whether to keep it or replace it with `go-go-goja/modules/database` once the web host/runtime story is clearer.
+- Review the write gate: currently `db.exec` requires both `--readonly=false` and `--allow-writes`.
+
+### What should be done in the future
+
+- T06 should add the minimal `ui.dsl` runtime module so CLI verbs and later web routes can render HTML nodes.
+
+### Code review instructions
+
+- Start with `internal/verbcli/runtime.go` and `internal/verbcli/command.go`.
+- Run `ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/005-runtime-smoke.sh`.
+
+### Technical details
+
+Successful smoke excerpts:
+
+```text
+[
+{
+  "key": "alpha"
+}
+, {
+  "key": "beta"
+}
+]
+[
+{
+  "name": "users"
+}
+]
+```

@@ -20,11 +20,12 @@ func TestScanRepositoriesDiscoversBuiltinVerb(t *testing.T) {
 	if err != nil {
 		t.Fatalf("CollectDiscoveredVerbs() error = %v", err)
 	}
-	if len(discovered) != 1 {
-		t.Fatalf("expected one built-in verb, got %d", len(discovered))
+	if len(discovered) != 3 {
+		t.Fatalf("expected three built-in verbs, got %d", len(discovered))
 	}
-	if got := discovered[0].Verb.FullPath(); got != "examples builtin hello" {
-		t.Fatalf("builtin verb path = %q", got)
+	paths := []string{discovered[0].Verb.FullPath(), discovered[1].Verb.FullPath(), discovered[2].Verb.FullPath()}
+	if !contains(paths, "examples builtin hello") || !contains(paths, "examples builtin yaml-keys") || !contains(paths, "examples builtin tables") {
+		t.Fatalf("builtin verb paths = %#v", paths)
 	}
 }
 
@@ -60,6 +61,15 @@ func TestLazyCommandListsBuiltinVerb(t *testing.T) {
 	if !strings.Contains(out.String(), "examples builtin hello") {
 		t.Fatalf("list output did not contain builtin verb: %q", out.String())
 	}
+}
+
+func contains(values []string, needle string) bool {
+	for _, value := range values {
+		if value == needle {
+			return true
+		}
+	}
+	return false
 }
 
 func writeRepo(t *testing.T, base string, name string) string {

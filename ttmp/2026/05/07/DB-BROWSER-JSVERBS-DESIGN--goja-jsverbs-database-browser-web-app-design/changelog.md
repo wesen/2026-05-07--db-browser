@@ -86,3 +86,17 @@ Mounted scanned jsverbs as a lazy dynamic CLI with list and duplicate tests.
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 9
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/004-jsverbs-cli-tests.sh — jsverbs CLI validation script
 
+
+## 2026-05-07
+
+Added CLI verb runtime profile with yaml and configured SQLite db aliases.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/verbcli/command.go — Runtime flags and invoker wiring
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/verbcli/runtime.go — Goja runtime factory and database/yaml module profile
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/verbrepos/builtin/db.js — SQLite runtime smoke verb
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/verbrepos/builtin/yaml.js — YAML runtime smoke verb
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 10
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/005-runtime-smoke.sh — Runtime validation script
+
