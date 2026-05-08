@@ -1021,3 +1021,80 @@ go test ./internal/verbcli ./internal/web ./internal/uidsl ./cmd/db-browser
 ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/005-runtime-smoke.sh
 ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/006-web-uidsl-copy-tests.sh
 ```
+
+## Step 13: Add `ui.table.fromRows` and expose ui.dsl to CLI verbs
+
+I finished the first high-level UI DSL primitive by adding `ui.table.fromRows(...)`, a basic chainable feature builder, renderer tests, and a built-in CLI smoke verb that renders an HTML table. I also registered the copied `ui.dsl` module in the CLI verb runtime so repository verbs can `require("ui.dsl")` before the web server is wired.
+
+### Prompt Context
+
+**User prompt (verbatim):** (same as Step 6)
+
+**Assistant interpretation:** Continue the task sequence with T06, completing the minimal UI DSL layer and saving validation commands as a ticket-local script.
+
+**Inferred user intent:** Build toward rich DB browser UIs by first proving a simple server-renderable table primitive.
+
+**Commit (code):** pending — ui.table.fromRows implementation.
+
+### What I did
+
+- Added `internal/uidsl/table.go`.
+- Added `ui.table("id")` builder object.
+- Added `ui.table.fromRows("id", rows)` helper.
+- Added `.features(f => f.pagination().sorting().columnPicker())` support with CSS classes.
+- Added `.render(ctx)` returning a normal `uidsl.Node` table.
+- Added escaping/table renderer tests in `internal/uidsl/table_test.go`.
+- Added `internal/verbrepos/builtin/ui.js` with `renderSampleTable` text-output verb.
+- Updated `internal/verbcli/runtime.go` to register `uidsl.NewRegistrar()` in CLI verb runtimes.
+- Added `scripts/007-uidsl-table-tests.sh`.
+- Ran the script successfully.
+
+### Why
+
+- `ui.table.fromRows` is the smallest useful high-level data-app primitive and a stepping stone toward the richer table builder planned for T08.
+- Exposing `ui.dsl` in CLI verbs makes it possible to test UI rendering without waiting for the HTTP server.
+
+### What worked
+
+- Unit tests pass for `internal/uidsl`, `internal/verbcli`, and `internal/verbrepos`.
+- The smoke command:
+  - `go run ./cmd/db-browser verbs examples builtin render-sample-table`
+  renders a table with `ui-table`, `ui-table--pagination`, and `ui-table--sorting` classes.
+
+### What didn't work
+
+- First test attempt panicked because the test called `Loader(vm, obj)` without setting `obj.exports`; copied module loaders expect a CommonJS module object with an `exports` object. I fixed the tests to match existing `render_test.go` setup.
+- Second attempt failed because Goja did not expose Go pointer methods like `.features` and `.render` in the way the JS chain expected. I replaced method-export reliance with explicit JavaScript objects built through `vm.NewObject()` and `obj.Set(...)` closures.
+- Feature methods (`pagination`, `sorting`, `columnPicker`) had the same issue, so I added an explicit `featureBuilderObject` too.
+
+### What I learned
+
+- For chainable JavaScript DSLs, explicit Goja object construction is more predictable than relying on exported Go methods.
+- Returning normal `uidsl.Node` values keeps the new table primitive compatible with the existing renderer and `res.html` path.
+
+### What was tricky to build
+
+- The tricky part was preserving a natural JS chain (`ui.table.fromRows(...).features(...).render(...)`) while the backing implementation is Go. The solution was to create tiny JS-facing objects whose methods close over Go builder state.
+
+### What warrants a second pair of eyes
+
+- Review whether `tableColumns` should preserve first-row order, explicit column order, or sorted order. It currently discovers keys in sorted order per row for deterministic tests.
+- Review whether feature CSS classes are the desired first representation for no-op features before pagination/sorting behavior is implemented.
+
+### What should be done in the future
+
+- T07 should wire `internal/web` into the `serve` command.
+- T08 should expand this table builder into real pagination, sorting, filters, and column definitions.
+
+### Code review instructions
+
+- Start with `internal/uidsl/table.go` and `internal/uidsl/table_test.go`.
+- Run `ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/007-uidsl-table-tests.sh`.
+
+### Technical details
+
+Successful smoke output:
+
+```html
+<table class="ui-table ui-table--pagination ui-table--sorting" id="sample"><thead><tr><th>name</th><th>role</th></tr></thead><tbody><tr><td>Alice</td><td>admin</td></tr><tr><td>Bob</td><td>viewer</td></tr></tbody></table>
+```

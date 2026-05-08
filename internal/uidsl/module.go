@@ -34,6 +34,17 @@ func Loader(vm *goja.Runtime, moduleObj *goja.Object) {
 	_ = exports.Set("raw", func(s string) *RawHTML { return &RawHTML{Value: s} })
 	_ = exports.Set("render", func(v goja.Value) (string, error) { return RenderAny(vm, v) })
 	_ = exports.Set("page", func(call goja.FunctionCall) goja.Value { return vm.ToValue(pageFromCall(call)) })
+	tableValue := vm.ToValue(func(id string) goja.Value { return tableBuilderObject(vm, newTableBuilder(id)) })
+	if tableObj, ok := tableValue.(*goja.Object); ok {
+		_ = tableObj.Set("fromRows", func(id string, rows goja.Value) (goja.Value, error) {
+			builder, err := tableFromRows(id, rows)
+			if err != nil {
+				return nil, err
+			}
+			return tableBuilderObject(vm, builder), nil
+		})
+	}
+	_ = exports.Set("table", tableValue)
 }
 
 func elementFromCall(tag string, call goja.FunctionCall) *Element {

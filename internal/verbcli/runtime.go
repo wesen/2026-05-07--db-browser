@@ -12,6 +12,8 @@ import (
 	databasemod "github.com/go-go-golems/go-go-goja/modules/database"
 	"github.com/go-go-golems/go-go-goja/pkg/jsverbs"
 	_ "github.com/mattn/go-sqlite3"
+
+	"github.com/go-go-golems/db-browser/internal/uidsl"
 )
 
 type RuntimeSettings struct {
@@ -80,7 +82,8 @@ func newRuntimeFactory(repo ScannedRepository, settings *RuntimeSettings) (*engi
 
 	builder := engine.NewBuilder(runtimeOptions(repo)...).
 		WithRequireOptions(noderequire.WithLoader(repo.Registry.RequireLoader())).
-		WithModules(moduleSpecs...)
+		WithModules(moduleSpecs...).
+		WithRuntimeModuleRegistrars(uidsl.NewRegistrar())
 	factory, err := builder.Build()
 	if err != nil {
 		cleanup()

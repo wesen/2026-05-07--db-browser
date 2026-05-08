@@ -52,9 +52,9 @@
 
 - [x] Add `internal/uidsl` node/render primitives or import/refactor the goja-hosting-site version.
 - [x] Expose `ui.dsl` / `ui` modules with `page`, tags, fragments, text, raw, and render.
-- [ ] Add `ui.table.fromRows` as the first high-level primitive.
+- [x] Add `ui.table.fromRows` as the first high-level primitive.
 - [x] Add renderer tests for escaping and documents via copied goja-hosting-site tests. (Basic table output remains with `ui.table.fromRows`.)
-- [ ] Commit minimal UI DSL.
+- [x] Commit minimal UI DSL.
 
 ### T07 — Minimal Express-style web host
 

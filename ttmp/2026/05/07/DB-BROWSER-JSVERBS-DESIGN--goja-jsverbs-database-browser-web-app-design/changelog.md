@@ -122,3 +122,17 @@ Copied goja-hosting-site web/uidsl packages and switched CLI runtime to go-go-go
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 12
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/006-web-uidsl-copy-tests.sh — Web/uidsl validation script
 
+
+## 2026-05-07
+
+Added ui.table.fromRows and CLI ui.dsl runtime smoke coverage.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/uidsl/table.go — ui.table.fromRows implementation
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/uidsl/table_test.go — UI table renderer tests
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/verbcli/runtime.go — Registers ui.dsl in CLI verb runtime
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/verbrepos/builtin/ui.js — CLI smoke verb for ui.dsl table rendering
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 13
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/007-uidsl-table-tests.sh — UI DSL validation script
+
