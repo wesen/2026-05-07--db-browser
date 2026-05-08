@@ -109,3 +109,16 @@ Recorded commit checkpoints for completed T01-T05 implementation tasks.
 
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Commit checkpoint diary step
 
+
+## 2026-05-07
+
+Copied goja-hosting-site web/uidsl packages and switched CLI runtime to go-go-goja database module.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/uidsl — Copied and adapted UI renderer package
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/verbcli/runtime.go — Now wires go-go-goja database module
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/web — Copied and adapted Express/web host package
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 12
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/006-web-uidsl-copy-tests.sh — Web/uidsl validation script
+

@@ -929,3 +929,95 @@ Current clean validation command:
 ```bash
 go test ./...
 ```
+
+## Step 12: Copy goja-hosting-site web and UI DSL packages, then switch CLI runtime to go-go-goja database module
+
+The user clarified that the Express module should be copied over verbatim and then adapted, and also asked to use the `go-go-goja` database module. I copied the `pkg/web` package from `goja-hosting-site` with `cp -r`, copied `pkg/uidsl` as the renderer dependency needed by the web tests, adapted package imports, and switched CLI verb runtime DB wiring back to `go-go-goja/modules/database` with a guarded `QueryExecer` wrapper.
+
+### Prompt Context
+
+**User prompt (verbatim):** "copy them over verbatim with cp -r and then adapt them."
+
+**Follow-up user prompt (verbatim):** "use go-go-goja's db module as well"
+
+**Assistant interpretation:** Bring over the existing Express/web host code directly, make the minimal import/API adaptations needed in this repo, and stop using the local handcrafted database JS module in favor of the existing go-go-goja database module.
+
+**Inferred user intent:** Avoid reimplementing proven Express/web pieces and keep database behavior aligned with go-go-goja's native module surface.
+
+**Commit (code):** pending — web/uidsl copy and database-module adaptation.
+
+### What I did
+
+- Ran `cp -r ../2026-05-03--goja-hosting-site/pkg/web internal/web`.
+- Ran `cp -r ../2026-05-03--goja-hosting-site/pkg/uidsl internal/uidsl` because copied web tests and `res.html` need the UI renderer.
+- Updated copied web tests to import `github.com/go-go-golems/db-browser/internal/uidsl` instead of `github.com/go-go-golems/goja-site/pkg/uidsl`.
+- Removed obsolete `UseModuleMiddleware(engine.MiddlewareOnly("time"))` test calls because the current `go-go-goja v0.4.14` builder does not have that API.
+- Updated `internal/verbcli/runtime.go` to use `go-go-goja/modules/database`:
+  - `databasemod.New(...)` for `database`;
+  - `databasemod.New(databasemod.WithName("db"), ...)` for `db`;
+  - a `guardedDB` implementing `Query` and `Exec` to preserve write gating.
+- Added `scripts/006-web-uidsl-copy-tests.sh`.
+- Ran:
+  - `go test ./internal/verbcli ./internal/web ./internal/uidsl ./cmd/db-browser`
+  - `scripts/005-runtime-smoke.sh`
+  - `scripts/006-web-uidsl-copy-tests.sh`
+
+### Why
+
+- The Express implementation already exists in `goja-hosting-site`; copying it keeps behavior close to the prototype the design references.
+- Using the existing `go-go-goja` DB module aligns the CLI runtime with the documented host module API and TypeScript declaration path.
+
+### What worked
+
+- `internal/web` tests pass after import and builder API adaptation.
+- `internal/uidsl` tests pass after copying.
+- Runtime smoke still passes with `go-go-goja/modules/database`:
+  - YAML key verb works.
+  - SQLite `tables` verb lists the temporary `users` table.
+
+### What didn't work
+
+- Immediately after copying `internal/web`, `go test ./internal/web` failed because copied tests imported `github.com/go-go-golems/goja-site/pkg/uidsl`.
+- After copying `internal/uidsl`, web tests still failed because copied tests used a newer/alternate builder API:
+
+```text
+engine.NewBuilder().UseModuleMiddleware undefined (type *engine.FactoryBuilder has no field or method UseModuleMiddleware)
+undefined: engine.MiddlewareOnly
+```
+
+- Fix: removed the unnecessary middleware calls in the copied tests for this module version.
+
+### What I learned
+
+- The `express` module is coupled to a `web.Host` and renderer, so copying only `express_module.go` is not enough. The useful unit is the `pkg/web` package plus a renderer package such as `uidsl`.
+- The current dependency version (`go-go-goja v0.4.14`) differs from the source prototype's builder API in small but important ways.
+
+### What was tricky to build
+
+- Preserving the user-requested `cp -r` workflow while keeping the repo buildable required minimal adaptation in tests rather than rewriting copied code. The runtime DB change was also intentionally small: keep the existing write-gated DB wrapper, but let `databasemod` own the JS export behavior.
+
+### What warrants a second pair of eyes
+
+- Review whether `internal/web` should stay copied or eventually be extracted to a shared package.
+- Review whether the copied tests lost any intended module restriction coverage when removing `UseModuleMiddleware`.
+
+### What should be done in the future
+
+- Finish T06 by adding `ui.table.fromRows` on top of the copied `uidsl` primitives.
+- Continue T07 by wiring the copied `web` package into the `serve` command.
+
+### Code review instructions
+
+- Review copied packages under `internal/web` and `internal/uidsl` first.
+- Review DB-module changes in `internal/verbcli/runtime.go`.
+- Run `ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/006-web-uidsl-copy-tests.sh` and `scripts/005-runtime-smoke.sh`.
+
+### Technical details
+
+Validation commands passed:
+
+```bash
+go test ./internal/verbcli ./internal/web ./internal/uidsl ./cmd/db-browser
+ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/005-runtime-smoke.sh
+ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/006-web-uidsl-copy-tests.sh
+```

@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/dop251/goja"
 	noderequire "github.com/dop251/goja_nodejs/require"
 	"github.com/go-go-golems/glazed/pkg/cmds/values"
 	"github.com/go-go-golems/go-go-goja/engine"
+	databasemod "github.com/go-go-golems/go-go-goja/modules/database"
 	"github.com/go-go-golems/go-go-goja/pkg/jsverbs"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -62,9 +62,18 @@ func newRuntimeFactory(repo ScannedRepository, settings *RuntimeSettings) (*engi
 			return nil, nil, fmt.Errorf("ping sqlite database %s: %w", settings.DBPath, err)
 		}
 		guarded := &guardedDB{db: db, allowWrites: settings.AllowWrites && !settings.ReadOnly}
+		databaseModule := databasemod.New(
+			databasemod.WithPreconfiguredDB(guarded),
+			databasemod.WithConfigureEnabled(false),
+		)
+		dbAliasModule := databasemod.New(
+			databasemod.WithName("db"),
+			databasemod.WithPreconfiguredDB(guarded),
+			databasemod.WithConfigureEnabled(false),
+		)
 		moduleSpecs = append(moduleSpecs,
-			engine.NativeModuleSpec{ModuleID: "database:configured", ModuleName: "database", Loader: dbModuleLoader(guarded)},
-			engine.NativeModuleSpec{ModuleID: "database:db-alias", ModuleName: "db", Loader: dbModuleLoader(guarded)},
+			engine.NativeModuleSpec{ModuleID: "database:configured", ModuleName: databaseModule.Name(), Loader: databaseModule.Loader},
+			engine.NativeModuleSpec{ModuleID: "database:db-alias", ModuleName: dbAliasModule.Name(), Loader: dbAliasModule.Loader},
 		)
 		cleanup = func() { _ = db.Close() }
 	}
@@ -97,77 +106,13 @@ type guardedDB struct {
 	allowWrites bool
 }
 
-func dbModuleLoader(db *guardedDB) noderequire.ModuleLoader {
-	return func(vm *goja.Runtime, moduleObj *goja.Object) {
-		exports := moduleObj.Get("exports").(*goja.Object)
-		_ = exports.Set("query", func(query string, args ...any) ([]map[string]any, error) {
-			return db.query(query, args...)
-		})
-		_ = exports.Set("exec", func(query string, args ...any) (map[string]any, error) {
-			return db.exec(query, args...)
-		})
-	}
+func (g *guardedDB) Query(query string, args ...any) (*sql.Rows, error) {
+	return g.db.Query(query, args...)
 }
 
-func (g *guardedDB) query(query string, args ...any) ([]map[string]any, error) {
-	rows, err := g.db.Query(query, flattenArgs(args)...)
-	if err != nil {
-		return nil, err
-	}
-	defer func() { _ = rows.Close() }()
-
-	cols, err := rows.Columns()
-	if err != nil {
-		return nil, err
-	}
-	ret := []map[string]any{}
-	for rows.Next() {
-		vals := make([]any, len(cols))
-		scan := make([]any, len(cols))
-		for i := range vals {
-			scan[i] = &vals[i]
-		}
-		if err := rows.Scan(scan...); err != nil {
-			return nil, err
-		}
-		row := map[string]any{}
-		for i, col := range cols {
-			row[col] = vals[i]
-		}
-		ret = append(ret, row)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return ret, nil
-}
-
-func (g *guardedDB) exec(query string, args ...any) (map[string]any, error) {
+func (g *guardedDB) Exec(query string, args ...any) (sql.Result, error) {
 	if !g.allowWrites {
 		return nil, fmt.Errorf("database writes are disabled; rerun with --readonly=false --allow-writes")
 	}
-	result, err := g.db.Exec(query, flattenArgs(args)...)
-	if err != nil {
-		return nil, err
-	}
-	ret := map[string]any{}
-	if n, err := result.RowsAffected(); err == nil {
-		ret["rowsAffected"] = n
-	}
-	if n, err := result.LastInsertId(); err == nil {
-		ret["lastInsertId"] = n
-	}
-	return ret, nil
-}
-
-func flattenArgs(args []any) []any {
-	ret := make([]any, 0, len(args))
-	for _, arg := range args {
-		if slice, ok := arg.([]any); ok {
-			ret = append(ret, slice...)
-			continue
-		}
-		ret = append(ret, arg)
-	}
-	return ret
+	return g.db.Exec(query, args...)
 }

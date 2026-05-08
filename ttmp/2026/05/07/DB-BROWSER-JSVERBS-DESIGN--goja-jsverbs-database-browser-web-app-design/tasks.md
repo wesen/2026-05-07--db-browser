@@ -50,15 +50,15 @@
 
 ### T06 — Minimal UI DSL package
 
-- [ ] Add `internal/uidsl` node/render primitives or import/refactor the goja-hosting-site version.
-- [ ] Expose `ui.dsl` / `ui` modules with `page`, tags, fragments, text, raw, and render.
+- [x] Add `internal/uidsl` node/render primitives or import/refactor the goja-hosting-site version.
+- [x] Expose `ui.dsl` / `ui` modules with `page`, tags, fragments, text, raw, and render.
 - [ ] Add `ui.table.fromRows` as the first high-level primitive.
-- [ ] Add renderer tests for escaping, documents, and basic table output.
+- [x] Add renderer tests for escaping and documents via copied goja-hosting-site tests. (Basic table output remains with `ui.table.fromRows`.)
 - [ ] Commit minimal UI DSL.
 
 ### T07 — Minimal Express-style web host
 
-- [ ] Add `internal/web` host, route registry, request/response DTOs, and `express` registrar.
+- [x] Add `internal/web` host, route registry, request/response DTOs, and `express` registrar.
 - [ ] Add `serve` command with `--addr`, `--db`, `--scripts-dir`, and `--dev`.
 - [ ] Load scripts in deterministic order and let them register routes.
 - [ ] Wire `res.html` through the UI renderer.
