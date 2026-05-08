@@ -5,6 +5,16 @@ topics:
       description: Backend services
     - slug: websocket
       description: WebSocket lifecycle & events
+    - slug: docmgr
+      description: Documentation manager ticket workflows and structured docs
+    - slug: goja
+      description: Goja JavaScript runtime integration and native module hosting
+    - slug: jsverbs
+      description: JavaScript functions scanned and exposed as Glazed/Cobra verbs
+    - slug: sqlite
+      description: SQLite database access, querying, and browser UIs
+    - slug: web-ui
+      description: Web user interfaces, UI DSLs, forms, tables, and dashboards
 docTypes:
     - slug: design-doc
       description: Structured rationale and architecture notes
