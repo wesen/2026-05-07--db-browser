@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/go-go-golems/db-browser/internal/app"
@@ -62,6 +63,10 @@ func newServeCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "serve",
 		Short: "Serve a Goja-backed SQLite browser web app",
+		Args:  cobra.NoArgs,
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			return validateServeStringFlags(cmd)
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, stop := signal.NotifyContext(cmd.Context(), os.Interrupt, syscall.SIGTERM)
 			defer stop()
@@ -81,6 +86,20 @@ func newServeCommand() *cobra.Command {
 	cmd.Flags().BoolVar(&readonly, "readonly", true, "Disable db.exec writes in served scripts")
 	cmd.Flags().BoolVar(&allowWrites, "allow-writes", false, "Allow db.exec writes when --readonly=false")
 	return cmd
+}
+
+func validateServeStringFlags(cmd *cobra.Command) error {
+	for _, name := range []string{"db", "scripts-dir", "addr"} {
+		flag := cmd.Flags().Lookup(name)
+		if flag == nil {
+			continue
+		}
+		value := flag.Value.String()
+		if strings.HasPrefix(value, "--") {
+			return fmt.Errorf("flag --%s received %q as its value; this usually means the intended value was empty (for example an unset shell variable). Set the variable and quote it, e.g. db-browser serve --db \"$TRACE_DB\" --scripts-dir \"$TRACE_APP\"", name, value)
+		}
+	}
+	return nil
 }
 
 func newInspectCommand() *cobra.Command {
