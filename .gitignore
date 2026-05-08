@@ -1,0 +1,20 @@
+# Build outputs
+/bin/
+/dist/
+/build/
+
+# Go test artifacts
+*.test
+*.cover
+coverage.out
+
+# Local runtime data
+*.db
+*.sqlite
+*.sqlite3
+/tmp/
+
+# Editor/OS noise
+.DS_Store
+.idea/
+.vscode/

@@ -505,3 +505,89 @@ set -euo pipefail
 
 docmgr doctor --ticket DB-BROWSER-JSVERBS-DESIGN --stale-after 30
 ```
+
+## Step 7: Implement the initial Go project skeleton
+
+I implemented the first runnable `db-browser` skeleton. This gives the repository a Go module, a Cobra root command, a placeholder `serve` command, a placeholder lazy `verbs` command, a basic `inspect modules` command that documents the intended JavaScript modules, a built-in example verb file for future scanning tests, and a ticket-local build script.
+
+### Prompt Context
+
+**User prompt (verbatim):** (same as Step 6)
+
+**Assistant interpretation:** Start executing the detailed task list, beginning with the project skeleton, and keep validation commands in the ticket scripts folder.
+
+**Inferred user intent:** Establish a compileable foundation before adding repository bootstrap and jsverbs runtime complexity.
+
+**Commit (code):** pending — skeleton implementation.
+
+### What I did
+
+- Added `go.mod` with module path `github.com/go-go-golems/db-browser` and Cobra dependency.
+- Added `cmd/db-browser/main.go` with:
+  - root command;
+  - `serve` placeholder and planned flags;
+  - `inspect modules` command;
+  - lazy `verbs` placeholder using `DisableFlagParsing: true`.
+- Added `examples/builtin-verbs/hello.js` with explicit `__package__` and `__verb__` metadata.
+- Added `.gitignore` for build, coverage, local DB, and editor artifacts.
+- Added `scripts/002-build-skeleton.sh` to run formatting, tests, and a module inspection smoke command.
+- Ran:
+  - `gofmt -w cmd/db-browser/main.go`
+  - `go mod tidy`
+  - `ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/002-build-skeleton.sh`
+
+### Why
+
+- A small compileable skeleton is the safest base for subsequent repository bootstrap and jsverbs mounting.
+- The lazy `verbs` placeholder preserves the intended css-visual-diff-style CLI shape from the start.
+
+### What worked
+
+- `go test ./...` passed.
+- `go run ./cmd/db-browser inspect modules` printed the intended module list:
+  - `database`
+  - `db`
+  - `fs`
+  - `yaml`
+  - `express`
+  - `ui.dsl`
+
+### What didn't work
+
+- N/A. The skeleton compiled and ran successfully.
+
+### What I learned
+
+- It is useful to keep `serve` and `verbs` present but explicitly not implemented yet so command discovery works while behavior remains honest.
+
+### What was tricky to build
+
+- The skeleton deliberately avoids importing `go-go-goja` until the next task so the first commit remains small and easy to review.
+
+### What warrants a second pair of eyes
+
+- Confirm the module path `github.com/go-go-golems/db-browser` is the intended future import path.
+
+### What should be done in the future
+
+- T03 should add repository bootstrap and tests.
+- T04 should replace the lazy `verbs` placeholder with dynamic command mounting.
+
+### Code review instructions
+
+- Start with `cmd/db-browser/main.go`.
+- Run `ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/002-build-skeleton.sh`.
+
+### Technical details
+
+Smoke output:
+
+```text
+?   	github.com/go-go-golems/db-browser/cmd/db-browser	[no test files]
+database
+db
+fs
+yaml
+express
+ui.dsl
+```

@@ -10,12 +10,12 @@
 
 ### T02 — Go project skeleton
 
-- [ ] Create `go.mod` for the DB browser app.
-- [ ] Add `cmd/db-browser/main.go` with root command, logging defaults, and a lazy `verbs` command placeholder.
-- [ ] Add a tiny embedded example verb repository for smoke tests.
-- [ ] Add `.gitignore` entries for build/test artifacts.
-- [ ] Run formatting and basic compile checks.
-- [ ] Commit the skeleton.
+- [x] Create `go.mod` for the DB browser app.
+- [x] Add `cmd/db-browser/main.go` with root command, logging defaults, and a lazy `verbs` command placeholder.
+- [x] Add a tiny embedded example verb repository for smoke tests.
+- [x] Add `.gitignore` entries for build/test artifacts.
+- [x] Run formatting and basic compile checks.
+- [x] Commit the skeleton.
 
 ### T03 — Verb repository bootstrap
 
