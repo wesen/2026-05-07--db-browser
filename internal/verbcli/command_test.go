@@ -20,11 +20,14 @@ func TestScanRepositoriesDiscoversBuiltinVerb(t *testing.T) {
 	if err != nil {
 		t.Fatalf("CollectDiscoveredVerbs() error = %v", err)
 	}
-	if len(discovered) != 3 {
-		t.Fatalf("expected three built-in verbs, got %d", len(discovered))
+	if len(discovered) != 4 {
+		t.Fatalf("expected four built-in verbs, got %d", len(discovered))
 	}
-	paths := []string{discovered[0].Verb.FullPath(), discovered[1].Verb.FullPath(), discovered[2].Verb.FullPath()}
-	if !contains(paths, "examples builtin hello") || !contains(paths, "examples builtin yaml-keys") || !contains(paths, "examples builtin tables") {
+	paths := []string{}
+	for _, item := range discovered {
+		paths = append(paths, item.Verb.FullPath())
+	}
+	if !contains(paths, "examples builtin hello") || !contains(paths, "examples builtin yaml-keys") || !contains(paths, "examples builtin tables") || !contains(paths, "examples builtin render-sample-table") {
 		t.Fatalf("builtin verb paths = %#v", paths)
 	}
 }
