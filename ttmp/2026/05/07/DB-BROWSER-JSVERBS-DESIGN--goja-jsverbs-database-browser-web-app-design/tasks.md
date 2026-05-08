@@ -29,14 +29,14 @@
 
 ### T04 — jsverbs scanning and dynamic CLI mounting
 
-- [ ] Scan each repository with `jsverbs.ScanFS` / `jsverbs.ScanDir`.
-- [ ] Default to `IncludePublicFunctions=false` for explicit `__verb__`-only command export.
-- [ ] Register DB-browser shared sections if needed.
-- [ ] Detect duplicate `verb.FullPath()` values with provenance.
-- [ ] Build a lazy `verbs` command that rebuilds the real command tree after bootstrap flag parsing.
-- [ ] Add a `verbs list` command that prints discovered verbs.
-- [ ] Add tests for duplicate detection and list output.
-- [ ] Commit jsverbs dynamic CLI mounting.
+- [x] Scan each repository with `jsverbs.ScanFS` / `jsverbs.ScanDir`.
+- [x] Default to `IncludePublicFunctions=false` for explicit `__verb__`-only command export.
+- [x] Register DB-browser shared sections if needed. (No shared sections needed yet.)
+- [x] Detect duplicate `verb.FullPath()` values with provenance.
+- [x] Build a lazy `verbs` command that rebuilds the real command tree after bootstrap flag parsing.
+- [x] Add a `verbs list` command that prints discovered verbs.
+- [x] Add tests for duplicate detection and list output.
+- [x] Commit jsverbs dynamic CLI mounting.
 
 ### T05 — Runtime module profile for CLI verbs
 

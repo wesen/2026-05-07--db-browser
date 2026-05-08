@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/go-go-golems/db-browser/internal/verbcli"
 	"github.com/spf13/cobra"
 )
 
@@ -26,7 +27,7 @@ functions as CLI commands, and will host Express-style database browser apps.`,
 
 	root.AddCommand(newServeCommand())
 	root.AddCommand(newInspectCommand())
-	root.AddCommand(newLazyVerbsCommand())
+	root.AddCommand(verbcli.NewLazyCommand())
 	return root
 }
 
@@ -68,16 +69,4 @@ func newInspectCommand() *cobra.Command {
 		},
 	})
 	return cmd
-}
-
-func newLazyVerbsCommand() *cobra.Command {
-	return &cobra.Command{
-		Use:                "verbs",
-		Short:              "Run repository-scanned JavaScript verbs",
-		DisableFlagParsing: true,
-		Args:               cobra.ArbitraryArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return fmt.Errorf("verbs are not implemented yet; received args: %v", args)
-		},
-	}
 }

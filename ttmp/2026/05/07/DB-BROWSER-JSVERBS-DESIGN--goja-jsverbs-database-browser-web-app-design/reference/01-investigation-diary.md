@@ -670,3 +670,89 @@ Validation command:
 ```bash
 ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/003-bootstrap-tests.sh
 ```
+
+## Step 9: Mount scanned jsverbs as a lazy dynamic CLI
+
+I replaced the placeholder `verbs` command with a real lazy command. It now discovers repositories, scans each repository with `jsverbs`, detects duplicate verb paths, mounts a `verbs list` command, and builds dynamic Glazed/Cobra commands for each discovered verb. Runtime execution is intentionally still a clear "not implemented yet" error because database/yaml/runtime wiring belongs to T05.
+
+### Prompt Context
+
+**User prompt (verbatim):** (same as Step 6)
+
+**Assistant interpretation:** Continue from repository bootstrap into T04: scan repositories, mount dynamic commands, test list output and duplicate diagnostics, and record failures.
+
+**Inferred user intent:** Make the command tree real before adding DB/browser runtime behavior.
+
+**Commit (code):** pending — jsverbs dynamic CLI mounting.
+
+### What I did
+
+- Added `internal/verbcli/command.go` with:
+  - `NewLazyCommand()`;
+  - repository scanning via `jsverbs.ScanFS` / `jsverbs.ScanDir`;
+  - explicit-only scan options (`IncludePublicFunctions=false`);
+  - duplicate `verb.FullPath()` detection with source provenance;
+  - dynamic command creation via `CommandForVerbWithInvoker`;
+  - a temporary runtime invoker that returns a clear not-implemented error.
+- Added `internal/verbcli/list.go` for `verbs list`.
+- Updated `cmd/db-browser/main.go` to use `verbcli.NewLazyCommand()`.
+- Added `internal/verbcli/command_test.go` for built-in scanning, duplicate detection, and lazy list output.
+- Added `scripts/004-jsverbs-cli-tests.sh`.
+- Ran `go get github.com/go-go-golems/go-go-goja@v0.4.14 github.com/go-go-golems/glazed@v1.2.5`.
+- Ran `go mod tidy` after the first test failure.
+- Ran `scripts/004-jsverbs-cli-tests.sh` successfully.
+
+### Why
+
+- Dynamic verbs must be present as real Cobra commands before runtime execution can be validated.
+- Keeping execution as a not-implemented invoker makes this commit focused on discovery and command mounting only.
+
+### What worked
+
+- `go test ./internal/verbrepos ./internal/verbcli ./cmd/db-browser` passed.
+- `go run ./cmd/db-browser verbs list` printed:
+  - `examples builtin hello	builtin	hello.js	hello	glaze`
+
+### What didn't work
+
+- The first run of `scripts/004-jsverbs-cli-tests.sh` failed with many missing `go.sum` entries from newly imported `glazed` and `go-go-goja` packages. Representative error:
+
+```text
+missing go.sum entry for module providing package github.com/araddon/dateparse (imported by github.com/go-go-golems/glazed/pkg/cmds/fields)
+```
+
+- Fix: ran `go mod tidy`, then reran the script successfully.
+
+### What I learned
+
+- Pulling in `jsverbs` brings in the full Glazed and go-go-goja dependency graph, so `go mod tidy` is required immediately after adding the dynamic CLI package.
+- The Go tool upgraded the module to `go 1.26.1` because `go-go-goja v0.4.14` requires Go 1.26.1 or newer.
+
+### What was tricky to build
+
+- The dynamic command can be mounted before runtime exists by using `CommandForVerbWithInvoker` and a temporary invoker. That keeps the command tree and schema generation testable while deferring DB/yaml runtime setup.
+
+### What warrants a second pair of eyes
+
+- Review whether `verbs list` should be a plain tab-separated Cobra command or a Glazed command. The current implementation is intentionally simple for smoke testing.
+
+### What should be done in the future
+
+- T05 should replace the temporary invoker with a real runtime factory and add `--db`/module-profile flags.
+
+### Code review instructions
+
+- Start with `internal/verbcli/command.go`.
+- Run `ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/004-jsverbs-cli-tests.sh`.
+- Confirm `go run ./cmd/db-browser verbs list` includes `examples builtin hello`.
+
+### Technical details
+
+Successful smoke output:
+
+```text
+ok  	github.com/go-go-golems/db-browser/internal/verbrepos
+ok  	github.com/go-go-golems/db-browser/internal/verbcli
+?   	github.com/go-go-golems/db-browser/cmd/db-browser	[no test files]
+examples builtin hello	builtin	hello.js	hello	glaze
+```

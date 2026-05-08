@@ -72,3 +72,17 @@ Implemented verb repository bootstrap with embedded/config/env/CLI sources and t
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 8
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/003-bootstrap-tests.sh — Bootstrap validation script
 
+
+## 2026-05-07
+
+Mounted scanned jsverbs as a lazy dynamic CLI with list and duplicate tests.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-07--db-browser/cmd/db-browser/main.go — Root command now uses verbcli
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/verbcli/command.go — Lazy dynamic jsverbs command implementation
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/verbcli/command_test.go — jsverbs CLI tests
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/verbcli/list.go — verbs list implementation
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 9
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/004-jsverbs-cli-tests.sh — jsverbs CLI validation script
+
