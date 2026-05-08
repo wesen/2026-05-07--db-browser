@@ -91,7 +91,7 @@ or run instructions that pass the repository explicitly:
 db-browser verbs --repository ./verbs list --output json
 ```
 
-Do not imply that `scripts/` used by `db-browser serve` is scanned as a verb repository. Serve scripts and verb repositories are separate inputs.
+Do not imply that `scripts/` used by `db-browser serve` is scanned as a verb repository. Serve scripts and verb repositories are separate inputs. Also do not point `db-browser serve --scripts-dir` at a mixed directory that contains verb files with `__package__` or `__verb__`, because those globals exist only in the verbs scanner/runtime. For projects that ship both surfaces, prefer `scripts/serve/` for route scripts and `scripts/verbs/` for CLI verbs.
 
 ## Master prompt template
 

@@ -645,6 +645,7 @@ Important distinctions:
 - `--scripts-dir` is for web app route scripts.
 - `--repository` / config/env repository sources are for JS verbs.
 - The two are intentionally separate inputs.
+- Do not point `db-browser serve --scripts-dir` at a directory that also contains verb-only files using `__package__` or `__verb__`; the serve runtime does not define those symbols. Keep mixed projects in separate subdirectories such as `scripts/serve/` and `scripts/verbs/`, then run `db-browser serve --scripts-dir scripts/serve` and `db-browser verbs --repository scripts/verbs ...`.
 
 ## Error handling patterns
 

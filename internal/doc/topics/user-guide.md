@@ -48,7 +48,7 @@ The most common command is:
 db-browser serve --db app.db --scripts-dir scripts --addr :8080 --dev
 ```
 
-Scripts are loaded from `--scripts-dir` in sorted filename order. Keep route registration code deterministic and avoid hidden startup side effects.
+Scripts are loaded from `--scripts-dir` in sorted filename order. Keep route registration code deterministic and avoid hidden startup side effects. The serve runtime executes every `.js` file under that directory, so do not mix serve route scripts with verb repository files that call `__package__` or `__verb__`. In mixed projects, use separate directories such as `scripts/serve/` for `db-browser serve` and `scripts/verbs/` for `db-browser verbs --repository`.
 
 ## Runtime modules
 

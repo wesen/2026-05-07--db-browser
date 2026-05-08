@@ -167,7 +167,7 @@ http://127.0.0.1:8080/?sort=total_cents&dir=desc
 
 ## 5. Understand the execution model
 
-`db-browser serve` loads all `.js` files from `--scripts-dir` in sorted order. Those scripts run once during startup and register routes. Route handlers run later when HTTP requests arrive.
+`db-browser serve` loads all `.js` files from `--scripts-dir` in sorted order. Those scripts run once during startup and register routes. Route handlers run later when HTTP requests arrive. If a project also contains JavaScript verbs, keep them outside the serve directory, for example in `scripts/verbs/`, because `__package__` and `__verb__` are only available to `db-browser verbs`, not to `db-browser serve`.
 
 The common route pattern is:
 
