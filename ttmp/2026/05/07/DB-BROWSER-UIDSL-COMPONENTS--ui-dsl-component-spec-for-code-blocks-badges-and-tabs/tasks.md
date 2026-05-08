@@ -69,6 +69,15 @@
 - [x] Validate with Go tests, smoke script, and a Playwright visual check.
 - [x] Commit syntax highlighting and styling update.
 
+### T09 — Server-interactive UI research article
+
+- [x] Write a textbook-style Obsidian article exploring backend-dispatched ui.dsl events.
+- [x] Include architecture diagrams, event time diagrams, implementation phases, examples, and failure modes.
+- [x] Store the original article in the Obsidian vault under `Projects/2026/05/08/`.
+- [x] Copy the article back into this ticket with `cp`.
+- [x] Update diary/changelog and validate ticket hygiene.
+- [x] Commit ticket copy and bookkeeping.
+
 ### T07 — Final validation and handoff
 
 - [x] Run `go test ./...`.

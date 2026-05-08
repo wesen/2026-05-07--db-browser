@@ -855,3 +855,86 @@ Highlighting remains escaped because every token is rendered as:
 ```go
 &Element{Tag: "span", Attrs: ..., Children: []Node{&Text{Value: tokenText}}}
 ```
+
+## Step 7: Write server-interactive ui.dsl research article
+
+I wrote a new Obsidian article that explores a possible next project: backend-dispatched UI events for `ui.dsl`. The article is intentionally written as a durable project exploration rather than an implementation ticket. It explains the mental model, handler registry design, event envelope, patch protocol, Goja runtime serialization, race conditions, examples, time diagrams, implementation phases, and failure modes.
+
+Per the user's request, I created the article in the Obsidian vault first, then used `cp` to copy it back into this ticket as a reference document.
+
+### Prompt Context
+
+**User prompt (verbatim):** "perfect, write a detailed research article for a new project (so, next to the project reports, but it's a full project exploration / brainstorm / proposal, written in the same textbook style, in the obsidian vault. How would we implement this, what are some examples, time diagrams, etc... The use `cp` to copy it back into the ticket."
+
+**Assistant interpretation:** Write a long-form Obsidian article in the project-report/article style that brainstorms backend-dispatched `ui.dsl` events, then copy that article into the current docmgr ticket.
+
+**Inferred user intent:** Preserve the server-interactive UI idea as durable design research while also attaching it to the db-browser component ticket for follow-up implementation planning.
+
+**Commit (code):** pending — research article copy and ticket bookkeeping.
+
+### What I did
+
+- Created Obsidian article:
+  - `/home/manuel/code/wesen/obsidian-vault/Projects/2026/05/08/ARTICLE - Server-Interactive ui.dsl - Backend-Dispatched UI Events.md`
+- Copied it back into the ticket with `cp`:
+  - `ttmp/2026/05/07/DB-BROWSER-UIDSL-COMPONENTS--ui-dsl-component-spec-for-code-blocks-badges-and-tabs/reference/02-server-interactive-ui-proposal.md`
+- Added T09 to `tasks.md`.
+- The article includes:
+  - conceptual model;
+  - architecture diagrams;
+  - event and patch protocol sketches;
+  - sequence/time diagrams for typing and refresh buttons;
+  - page-instance handler registry proposal;
+  - Goja runtime concurrency rules;
+  - security model;
+  - authoring examples;
+  - implementation phases;
+  - testing and documentation strategy.
+
+### Why
+
+- The idea is larger than the current codeBlock/badge/tabs component ticket. It deserves a standalone project exploration that a future reader can use to start an implementation ticket.
+
+### What worked
+
+- The article was written in the Obsidian vault.
+- The article was copied back into the ticket with `cp`.
+- `docmgr doctor --ticket DB-BROWSER-UIDSL-COMPONENTS --stale-after 30` passed after copying.
+
+### What didn't work
+
+- N/A in this step.
+
+### What I learned
+
+- The cleanest first implementation is not full LiveView. It is a tiny HTTP event endpoint, page-scoped handler registry, and `ui.replace(selector, node)` patch response.
+
+### What was tricky to build
+
+- The key design challenge is Goja runtime ownership. Event handlers and route handlers must serialize access to a runtime, otherwise concurrent browser events can call into the same Goja VM at once.
+
+### What warrants a second pair of eyes
+
+- Review whether the first implementation should use explicit wrappers (`ui.onChange(node, fn)`) before method sugar (`node.onChange(fn)`). The article recommends wrappers first.
+- Review the security model around handler IDs as session/page-scoped capabilities.
+
+### What should be done in the future
+
+- Create a dedicated implementation ticket for server-interactive `ui.dsl` events.
+- Start with click/change events and `ui.replace` patches over HTTP.
+- Add Playwright tests only after the minimal event bridge is working.
+
+### Code review instructions
+
+- Read the vault article first for the polished narrative.
+- Read the ticket copy if reviewing inside the repo:
+  - `reference/02-server-interactive-ui-proposal.md`
+
+### Technical details
+
+Copy command used:
+
+```bash
+cp "/home/manuel/code/wesen/obsidian-vault/Projects/2026/05/08/ARTICLE - Server-Interactive ui.dsl - Backend-Dispatched UI Events.md" \
+  "ttmp/2026/05/07/DB-BROWSER-UIDSL-COMPONENTS--ui-dsl-component-spec-for-code-blocks-badges-and-tabs/reference/02-server-interactive-ui-proposal.md"
+```
