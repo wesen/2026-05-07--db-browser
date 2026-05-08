@@ -1606,3 +1606,106 @@ Supported filter query examples:
 ?filter_name=alice
 ?q=example&sort=id&dir=desc&page=1
 ```
+
+## Step 20: Add retro Macintosh-style examples and validate filters in browser
+
+I continued the follow-up batch by making the examples feel like actual small applications rather than plain HTML fixtures. The examples now use inline monochrome Macintosh/System-1-inspired styling: boxed windows, striped title bars, hard black borders, offset shadows, Chicago/Geneva-style font fallbacks, and a few muted accent colors for panels, badges, and metrics.
+
+I also exercised the new filters in the browser against the seeded Playwright app. The retro smoke app now demonstrates real filter state, empty states, badges, tags, money formatting, metrics, and a detail route under the themed interface.
+
+### Prompt Context
+
+**User prompt (verbatim):** (same as Step 19)
+
+**Assistant interpretation:** Continue with the richer example and CSS part of the request after committing the functional filter core.
+
+**Inferred user intent:** Make the prototype visually reviewable and interactive enough to judge the DB browser direction in a real browser.
+
+**Commit (code):** pending — retro styled examples.
+
+### What I did
+
+- Updated `examples/playwright-smoke/scripts/app.js` with:
+  - inline retro CSS;
+  - window/titlebar layout;
+  - ledger stat cards;
+  - filter-enabled customer table;
+  - detail page styling;
+  - badges, tags, and money formatting examples.
+- Updated `examples/generic-browser/scripts/app.js` with:
+  - retro CSS;
+  - summary cards;
+  - filter-enabled table list;
+  - `/tables/:name` detail page for columns and sample rows.
+- Updated `examples/yaml-dashboard/scripts/app.js` with:
+  - retro CSS;
+  - metric cards;
+  - filter-enabled metrics table.
+- Expanded `examples/yaml-dashboard/dashboard.yaml` with grouped/tone metadata and a third metric.
+- Added `scripts/014-retro-filter-smoke.sh` to validate themed output and filters through HTTP.
+- Updated `scripts/013-playwright-checklist.md` with the retro/filter browser validation performed.
+- Fixed nil tag rendering in `internal/uidsl/table.go` so missing tags do not render as `<nil>`.
+
+### Why
+
+- The user asked specifically for a monochrome retro Mac look with muted accents, plus more complex examples. The examples are now useful as visual demos, not only integration fixtures.
+- The filter feature needed to be proven through a browser flow, not just unit tests.
+
+### What worked
+
+- `go test ./...` passed.
+- `scripts/010-examples-smoke.sh` passed.
+- `scripts/012-playwright-smoke.sh` passed.
+- `scripts/014-retro-filter-smoke.sh` passed.
+- Manual Playwright checks on `http://127.0.0.1:19091/?filter.segment=vip` showed only `Alice Example` and `Page 1 of 1 (1 rows)`.
+- Submitting global search `bob` while `filter.segment=vip` was active produced an empty filtered result and `Page 1 of 1 (0 rows)`.
+- The current Playwright console check reported zero errors/warnings.
+
+### What didn't work
+
+- After the first visual pass, rows with missing tag data rendered a `<nil>` tag because `splitTags(nil)` fell through to `fmt.Sprint(value)`. I fixed this by returning an empty tag list for nil values.
+
+### What I learned
+
+- Inline example CSS is enough for now and keeps each example self-contained under the current host surface. A future asset/static-file route would let these examples share a theme stylesheet.
+
+### What was tricky to build
+
+- The theme had to work with raw server-rendered HTML and no JS/CSS build step. I kept the style deliberately low-tech: CSS variables, borders, repeated gradients, shadows, and table/form styling that map well to generated `ui.dsl` markup.
+- The filter form preserves empty column filter fields on submit, so the filter parser must ignore empty values. It already does that through `filterMapFromQuery`.
+
+### What warrants a second pair of eyes
+
+- Review visual taste: the theme is inspired by early monochrome Macintosh UI, but not a pixel-perfect recreation.
+- Review whether the examples should keep inline CSS or move to a shared theme module once static assets are supported.
+
+### What should be done in the future
+
+- Add actual row links once `ColumnSpec.link` becomes functional.
+- Add a static-file route or theme package so examples can share CSS.
+- Automate the Playwright assertions rather than keeping the browser checklist manual.
+
+### Code review instructions
+
+- Start with `examples/playwright-smoke/scripts/app.js` for the most complete demo.
+- Then review `examples/generic-browser/scripts/app.js` and `examples/yaml-dashboard/scripts/app.js`.
+- Validate with:
+
+```bash
+go test ./...
+ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/014-retro-filter-smoke.sh
+```
+
+### Technical details
+
+Manual Playwright validation covered:
+
+```text
+http://127.0.0.1:19091/?filter.segment=vip
+```
+
+and form submission to:
+
+```text
+?q=bob&filter.name=&filter.segment=vip&filter.email=&filter.tags=
+```

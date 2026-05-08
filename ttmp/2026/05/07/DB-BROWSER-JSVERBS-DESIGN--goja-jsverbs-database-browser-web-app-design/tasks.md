@@ -100,11 +100,11 @@
 
 ### T12 — Retro Mac-style example UI
 
-- [ ] Add monochrome Macintosh/System 1 inspired CSS with muted accent colors.
-- [ ] Apply the CSS to the smoke/browser examples.
-- [ ] Make the examples more complex with search/filter state, metrics, and detail views.
-- [ ] Validate with curl, Go tests, and Playwright.
-- [ ] Commit the themed examples.
+- [x] Add monochrome Macintosh/System 1 inspired CSS with muted accent colors.
+- [x] Apply the CSS to the smoke/browser examples.
+- [x] Make the examples more complex with search/filter state, metrics, and detail views.
+- [x] Validate with curl, Go tests, and Playwright.
+- [x] Commit the themed examples.
 
 ### T13 — Browser automation follow-up
 

@@ -56,3 +56,16 @@ app.get("/favicon.ico", (req, res) => res.status(204).end());
 ```
 
 After server restart, the current Playwright console message check returned zero errors and warnings.
+
+## Retro/filter validation performed on 2026-05-07
+
+- Started the retro smoke app on port `19091`.
+- Navigated to `http://127.0.0.1:19091/?filter.segment=vip`.
+- Confirmed only `Alice Example` remained visible and the pagination text showed `Page 1 of 1 (1 rows)`.
+- Filled the global search box with `bob` while the `vip` segment filter was still active.
+- Submitted the form and confirmed the URL carried both filter states:
+  - `?q=bob&filter.name=&filter.segment=vip&filter.email=&filter.tags=`
+- Confirmed the result set became empty and pagination showed `Page 1 of 1 (0 rows)`.
+- Clicked `Clear` and confirmed the unfiltered table rendered again.
+- Confirmed the current Playwright console check reported zero errors and warnings.
+- Captured a screenshot locally as `retro-filter-smoke.png`, then removed it from the working tree to avoid committing generated artifacts.

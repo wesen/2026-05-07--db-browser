@@ -631,6 +631,9 @@ func filterMapFromQuery(query map[string]any) map[string]any {
 }
 
 func splitTags(value any) []string {
+	if value == nil {
+		return []string{}
+	}
 	switch v := value.(type) {
 	case []any:
 		parts := make([]string, 0, len(v))

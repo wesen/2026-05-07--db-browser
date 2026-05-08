@@ -214,3 +214,19 @@ Added functional ui.table filters with static row filtering, sorting, pagination
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 19
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/tasks.md — Added T11-T13
 
+
+## 2026-05-07
+
+Added retro Macintosh-style CSS examples, richer demo screens, and filter smoke validation.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-07--db-browser/examples/generic-browser/scripts/app.js — Retro generic SQLite browser example
+- /home/manuel/code/wesen/2026-05-07--db-browser/examples/playwright-smoke/scripts/app.js — Retro smoke app with filters
+- /home/manuel/code/wesen/2026-05-07--db-browser/examples/yaml-dashboard/dashboard.yaml — Expanded metric metadata
+- /home/manuel/code/wesen/2026-05-07--db-browser/examples/yaml-dashboard/scripts/app.js — Retro YAML dashboard example
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/uidsl/table.go — Nil tag rendering fix
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 20
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/013-playwright-checklist.md — Retro Playwright validation notes
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/014-retro-filter-smoke.sh — Retro filter smoke script
+
