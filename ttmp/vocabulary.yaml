@@ -15,6 +15,14 @@ topics:
       description: SQLite database access, querying, and browser UIs
     - slug: web-ui
       description: Web user interfaces, UI DSLs, forms, tables, and dashboards
+    - slug: db-browser
+      description: db-browser Goja SQLite web app playground
+    - slug: ui-dsl
+      description: Server-rendered UI DSL components and rendering
+    - slug: server-rendered-ui
+      description: Server-rendered HTML user interfaces
+    - slug: documentation
+      description: Project and API documentation
 docTypes:
     - slug: design-doc
       description: Structured rationale and architecture notes
