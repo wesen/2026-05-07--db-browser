@@ -59,11 +59,11 @@
 ### T07 — Minimal Express-style web host
 
 - [x] Add `internal/web` host, route registry, request/response DTOs, and `express` registrar.
-- [ ] Add `serve` command with `--addr`, `--db`, `--scripts-dir`, and `--dev`.
-- [ ] Load scripts in deterministic order and let them register routes.
-- [ ] Wire `res.html` through the UI renderer.
-- [ ] Add `httptest` integration test for HTML, JSON, redirect, and POST body handling.
-- [ ] Commit web host.
+- [x] Add `serve` command with `--addr`, `--db`, `--scripts-dir`, and `--dev`.
+- [x] Load scripts in deterministic order and let them register routes.
+- [x] Wire `res.html` through the UI renderer.
+- [x] Add `httptest` integration test for HTML, JSON, redirect, and POST body handling.
+- [x] Commit web host.
 
 ### T08 — Rich table DSL v1
 

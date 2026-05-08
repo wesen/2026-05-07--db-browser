@@ -136,3 +136,16 @@ Added ui.table.fromRows and CLI ui.dsl runtime smoke coverage.
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 13
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/007-uidsl-table-tests.sh — UI DSL validation script
 
+
+## 2026-05-07
+
+Wired copied Express host into db-browser serve command with SQLite and ui.dsl modules.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-07--db-browser/cmd/db-browser/main.go — serve command now runs app server
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/app/server.go — Goja web server runtime and script loader
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/app/server_test.go — Serve integration tests
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 14
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/008-serve-tests.sh — Serve validation script
+

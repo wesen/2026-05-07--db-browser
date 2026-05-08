@@ -1098,3 +1098,87 @@ Successful smoke output:
 ```html
 <table class="ui-table ui-table--pagination ui-table--sorting" id="sample"><thead><tr><th>name</th><th>role</th></tr></thead><tbody><tr><td>Alice</td><td>admin</td></tr><tr><td>Bob</td><td>viewer</td></tr></tbody></table>
 ```
+
+## Step 14: Wire the copied Express host into the `serve` command
+
+I implemented the first working web-server path. The new `internal/app.Server` opens SQLite, builds a Goja runtime with `database`, `db`, `yaml`, `fs`, `path`, `time`, `timer`, `express`, and `ui.dsl`, loads app scripts in sorted order, and exposes the copied `web.Host` as an HTTP handler. The `db-browser serve` command now constructs and runs this server.
+
+### Prompt Context
+
+**User prompt (verbatim):** (same as Step 6)
+
+**Assistant interpretation:** Continue the implementation sequence into T07 by adapting the copied Express host into an actual served app runtime.
+
+**Inferred user intent:** Move from CLI-only JavaScript execution to the requested Express-style web application host.
+
+**Commit (code):** pending — serve command and app server.
+
+### What I did
+
+- Added `internal/app/server.go` with:
+  - `Config`;
+  - `Server`;
+  - `NewServer`;
+  - deterministic `LoadScripts`;
+  - `Handler`, `Run`, and `Close`;
+  - write-gated SQLite wrapper for `go-go-goja/modules/database`.
+- Added `internal/app/server_test.go` with `httptest` coverage for:
+  - script-loaded HTML route;
+  - JSON route using `require("db")`;
+  - write-gate error from `db.exec` in read-only mode.
+- Updated `cmd/db-browser serve` to accept:
+  - `--addr`;
+  - `--db`;
+  - `--scripts-dir`;
+  - `--dev`;
+  - `--readonly`;
+  - `--allow-writes`.
+- Added `scripts/008-serve-tests.sh`.
+- Ran `scripts/008-serve-tests.sh` successfully.
+
+### Why
+
+- The copied Express module needed to be connected to a runtime, database module, UI renderer, script loader, and CLI command before it could satisfy the requested web-app behavior.
+
+### What worked
+
+- Scripts can register Express routes.
+- `res.html(ui.page(...))` renders through `uidsl.RenderAny`.
+- `res.json(db.query(...))` works from hosted routes.
+- Read-only write gating returns a development-mode JavaScript handler error.
+
+### What didn't work
+
+- The first `internal/app` JSON test expected an empty DB query to encode as `[]`, but `go-go-goja/modules/database` returns a nil slice for zero rows, which JSON encodes as `null`. I updated the test to accept both `[]` and `null` for the empty-table case rather than changing the upstream DB module behavior in this task.
+
+### What I learned
+
+- The copied `web.Host` and `ExpressRegistrar` integrate cleanly with the current `go-go-goja` runtime once `uidsl.NewRegistrar()` and the database modules are registered in the same factory.
+- Empty query result normalization may deserve a future decision: preserve `null` from go-go-goja or wrap/normalize to `[]` for UI ergonomics.
+
+### What was tricky to build
+
+- The server has to ensure route registration happens during script loading before HTTP requests are served. The runtime owner pattern from `web.Host` handles request-time JS calls after that.
+
+### What warrants a second pair of eyes
+
+- Review whether default `--db` should be `./app.db` as implemented or remain required for explicitness.
+- Review empty result handling for `db.query` in hosted routes.
+
+### What should be done in the future
+
+- Add a real example under `examples/generic-browser` that runs via `db-browser serve`.
+- Continue T08 by expanding `ui.table` into pagination/sorting/filtering.
+
+### Code review instructions
+
+- Start with `internal/app/server.go` and `cmd/db-browser/main.go`.
+- Run `ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/008-serve-tests.sh`.
+
+### Technical details
+
+Validation command:
+
+```bash
+ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/008-serve-tests.sh
+```
