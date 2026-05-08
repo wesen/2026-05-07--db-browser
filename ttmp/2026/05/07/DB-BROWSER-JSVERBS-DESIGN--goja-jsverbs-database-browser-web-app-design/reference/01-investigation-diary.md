@@ -1988,3 +1988,101 @@ Original: 1000x680
 Crop:     976x590
 Path:     docs/assets/db-browser-retro-smoke.png
 ```
+
+## Step 24: Use Glazed structured output for `verbs list`
+
+I converted `db-browser verbs list` from hand-written tab-separated text to a real Glazed command. The command now emits rows with named fields and supports normal Glazed output flags such as `--output json`, `--output csv`, `--fields`, and sorting/filtering middleware.
+
+This makes verb discovery usable in scripts and by other tools without parsing ad hoc text.
+
+### Prompt Context
+
+**User prompt (verbatim):** "use glazed command structured output for db-browser verbs list ?"
+
+**Assistant interpretation:** Replace the manual `fmt.Fprintf` implementation of `verbs list` with a Glazed row-emitting command.
+
+**Inferred user intent:** Make discovered verb metadata queryable and script-friendly through the standard Glazed output machinery.
+
+**Commit (code):** pending — structured verb list output.
+
+### What I did
+
+- Rewrote `internal/verbcli/list.go` as a `cmds.GlazeCommand`.
+- Added Glazed output and command-settings sections to the command description.
+- Emit one row per discovered verb with fields:
+  - `path`;
+  - `repository`;
+  - `file`;
+  - `function`;
+  - `output_mode`;
+  - `source`;
+  - `location`.
+- Updated `internal/verbcli/command.go` to handle the new constructor's error return.
+- Updated `internal/verbcli/command_test.go` to validate JSON structured output.
+- Updated `internal/doc/topics/user-guide.md` with structured-output examples.
+
+### Why
+
+- Glazed structured output makes `verbs list` consistent with the rest of the CLI and easier to consume from automation.
+
+### What worked
+
+- `go test ./internal/verbcli -count=1` passed.
+- `go test ./...` passed.
+- Manual validation worked:
+
+```bash
+go run ./cmd/db-browser verbs list --output json
+go run ./cmd/db-browser verbs list --fields path,repository,file --output csv
+```
+
+### What didn't work
+
+- The first updated test failed because Glazed writes command output to `os.Stdout`, not the Cobra command's `SetOut` buffer used by the old manual command test.
+- Fix: updated the test to capture `os.Stdout` while executing `verbs list --output json`.
+- The next assertion failed because the JSON formatter includes a space after colons. I updated the expected substring from `"path":"..."` to `"path": "..."`.
+
+### What I learned
+
+- For Glazed command tests built through `BuildCobraCommandFromCommand`, capturing `cmd.SetOut` is not enough; capture stdout or test the command implementation directly with a processor.
+
+### What was tricky to build
+
+- `verbs list` is mounted under a lazy command that reconstructs the real command tree after repository discovery. The list command still needs to be built after discovery so it can close over the discovered verb slice.
+
+### What warrants a second pair of eyes
+
+- Review the chosen field names before they become a stable scripting interface.
+- Consider whether `parents`, `short`, or package metadata should also be emitted.
+
+### What should be done in the future
+
+- Add `--output json` examples to `app-playbook` if LLMs should inspect available verbs.
+- Consider a `verbs repositories list` structured command for repository provenance.
+
+### Code review instructions
+
+- Start with `internal/verbcli/list.go`.
+- Validate with:
+
+```bash
+go test ./...
+go run ./cmd/db-browser verbs list --output json
+go run ./cmd/db-browser verbs list --fields path,repository,file --output csv
+```
+
+### Technical details
+
+Example JSON row:
+
+```json
+{
+  "path": "examples builtin hello",
+  "repository": "builtin",
+  "file": "hello.js",
+  "function": "hello",
+  "output_mode": "glaze",
+  "source": "embedded",
+  "location": "builtin:builtin"
+}
+```

@@ -258,10 +258,17 @@ For production-quality generated apps, compute an accurate `total` using the sam
 
 The `verbs` command scans configured JavaScript repositories and mounts explicit `__verb__` definitions as CLI commands.
 
-List discovered verbs:
+List discovered verbs as structured Glazed rows:
 
 ```bash
 db-browser verbs list
+```
+
+Select machine-readable output or a field subset when scripting:
+
+```bash
+db-browser verbs list --output json
+db-browser verbs list --fields path,repository,file --output csv
 ```
 
 Repository sources include:

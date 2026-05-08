@@ -57,13 +57,38 @@ func TestLazyCommandListsBuiltinVerb(t *testing.T) {
 	var out bytes.Buffer
 	cmd.SetOut(&out)
 	cmd.SetErr(&out)
-	cmd.SetArgs([]string{"list"})
-	if err := cmd.ExecuteContext(context.Background()); err != nil {
-		t.Fatalf("ExecuteContext() error = %v\noutput:\n%s", err, out.String())
+	cmd.SetArgs([]string{"list", "--output", "json"})
+	stdout := captureStdout(t, func() {
+		if err := cmd.ExecuteContext(context.Background()); err != nil {
+			t.Fatalf("ExecuteContext() error = %v\noutput:\n%s", err, out.String())
+		}
+	})
+	if !strings.Contains(stdout, `"path": "examples builtin hello"`) {
+		t.Fatalf("list JSON output did not contain builtin verb: %q", stdout)
 	}
-	if !strings.Contains(out.String(), "examples builtin hello") {
-		t.Fatalf("list output did not contain builtin verb: %q", out.String())
+	if !strings.Contains(stdout, `"repository": "builtin"`) {
+		t.Fatalf("list JSON output did not contain repository: %q", stdout)
 	}
+}
+
+func captureStdout(t *testing.T, fn func()) string {
+	t.Helper()
+	old := os.Stdout
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatalf("pipe: %v", err)
+	}
+	os.Stdout = w
+	defer func() { os.Stdout = old }()
+	fn()
+	if err := w.Close(); err != nil {
+		t.Fatalf("close writer: %v", err)
+	}
+	var buf bytes.Buffer
+	if _, err := buf.ReadFrom(r); err != nil {
+		t.Fatalf("read stdout: %v", err)
+	}
+	return buf.String()
 }
 
 func contains(values []string, needle string) bool {

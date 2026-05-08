@@ -273,3 +273,16 @@ Added top-level README with cropped retro UI screenshot.
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 23
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/tasks.md — Added README/screenshot task
 
+
+## 2026-05-07
+
+Converted db-browser verbs list to Glazed structured output.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/doc/topics/user-guide.md — Structured verbs list examples
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/verbcli/command.go — List command constructor wiring
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/verbcli/command_test.go — Structured output test
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/verbcli/list.go — Glazed row-emitting list command
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 24
+

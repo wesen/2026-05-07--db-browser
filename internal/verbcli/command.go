@@ -82,7 +82,11 @@ func newCommandWithInvokerFactory(bootstrap verbrepos.Bootstrap, invokers Invoke
 	if err != nil {
 		return nil, err
 	}
-	root.AddCommand(newListCommand(discovered))
+	listCmd, err := newListCommand(discovered)
+	if err != nil {
+		return nil, err
+	}
+	root.AddCommand(listCmd)
 	commands, err := buildCommands(discovered, invokers)
 	if err != nil {
 		return nil, err
