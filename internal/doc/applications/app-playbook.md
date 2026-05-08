@@ -57,6 +57,42 @@ const yaml = require("yaml");
 const ui = require("ui.dsl");
 ```
 
+## Verb repository discovery contract
+
+If the generated app also includes JavaScript CLI verbs, or if the LLM tells the user to inspect verbs, it must explain repository discovery explicitly.
+
+By default, `db-browser verbs ...` scans only the embedded built-in repository:
+
+```bash
+db-browser verbs list --fields path,repository,source,location --output table
+```
+
+The default rows come from repository `builtin`, source `embedded`, location `builtin:builtin`. They are smoke/demo verbs, not the user's app scripts.
+
+Additional verb repositories are discovered from:
+
+- `.db-browser.yml`;
+- `.db-browser.override.yml`;
+- `DB_BROWSER_VERB_REPOSITORIES`;
+- leading CLI flags `--repository` or `--verb-repository`.
+
+A generated app that wants to ship its own verbs should include either a config file:
+
+```yaml
+verbs:
+  repositories:
+    - name: app-verbs
+      path: ./verbs
+```
+
+or run instructions that pass the repository explicitly:
+
+```bash
+db-browser verbs --repository ./verbs list --output json
+```
+
+Do not imply that `scripts/` used by `db-browser serve` is scanned as a verb repository. Serve scripts and verb repositories are separate inputs.
+
 ## Master prompt template
 
 Copy this prompt and adapt the domain details.

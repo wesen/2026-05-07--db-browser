@@ -286,3 +286,14 @@ Converted db-browser verbs list to Glazed structured output.
 - /home/manuel/code/wesen/2026-05-07--db-browser/internal/verbcli/list.go — Glazed row-emitting list command
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 24
 
+
+## 2026-05-07
+
+Clarified default verb repository discovery in getting-started and app-playbook help docs.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/doc/applications/app-playbook.md — LLM-facing verb repository discovery contract
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/doc/tutorials/getting-started.md — Default built-in verb repository documentation
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 25
+

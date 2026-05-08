@@ -2086,3 +2086,78 @@ Example JSON row:
   "location": "builtin:builtin"
 }
 ```
+
+## Step 25: Clarify default verb repository discovery in help docs
+
+I checked the embedded help docs after the repository-discovery question. The `user-guide` already documented repository sources, but `getting-started` only mentioned configured repositories at a high level, and `app-playbook` did not warn LLMs that serve scripts and verb repositories are separate inputs.
+
+I updated both requested documents so the default behavior is explicit: without config, environment, or CLI repository flags, `db-browser verbs` scans only the embedded `builtin` repository.
+
+### Prompt Context
+
+**User prompt (verbatim):** "is this documented in the getting-started and app-playbook?"
+
+**Assistant interpretation:** Verify whether default verb repository discovery is documented in the embedded help entries and patch missing coverage.
+
+**Inferred user intent:** Ensure users and LLMs do not assume `scripts/` or other local directories are scanned automatically by `db-browser verbs`.
+
+**Commit (code):** pending — help doc clarification.
+
+### What I did
+
+- Searched embedded help entries for repository-discovery coverage.
+- Updated `internal/doc/tutorials/getting-started.md` to explain:
+  - default scan is only the embedded built-in repository;
+  - built-in provenance is `repository=builtin`, `source=embedded`, `location=builtin:builtin`;
+  - additional repositories come from config, env, or leading CLI flags.
+- Updated `internal/doc/applications/app-playbook.md` with a `Verb repository discovery contract` section for LLM handoff.
+- Explicitly documented that `--scripts-dir` serve scripts are not automatically scanned as verb repositories.
+
+### Why
+
+- This distinction is easy to miss and directly affects how users run `db-browser verbs`.
+- The app playbook is meant for LLMs, so it should prevent generated instructions that conflate web app scripts with verb repositories.
+
+### What worked
+
+- `go test ./...` passed.
+- `go run ./cmd/db-browser help getting-started` rendered the new built-in repository explanation.
+- `go run ./cmd/db-browser help app-playbook` rendered the new discovery contract.
+
+### What didn't work
+
+- N/A in this step.
+
+### What I learned
+
+- The user guide already had the repository source list, but the two docs the user named needed the more explicit default-behavior wording.
+
+### What was tricky to build
+
+- The wording needed to separate three concepts clearly: embedded built-in verbs, configured verb repositories, and `serve` scripts.
+
+### What warrants a second pair of eyes
+
+- Review whether `.db-browser.yml` should be introduced earlier in `getting-started`, or whether keeping it in the later “Next commands” section is enough.
+
+### What should be done in the future
+
+- Add a structured `verbs repositories list` command so users can inspect repository provenance directly instead of inferring it from `verbs list` rows.
+
+### Code review instructions
+
+- Review `internal/doc/tutorials/getting-started.md` and `internal/doc/applications/app-playbook.md`.
+- Validate with:
+
+```bash
+go run ./cmd/db-browser help getting-started
+go run ./cmd/db-browser help app-playbook
+```
+
+### Technical details
+
+New example command:
+
+```bash
+db-browser verbs list --fields path,repository,source,location --output table
+```

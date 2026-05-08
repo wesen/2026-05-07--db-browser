@@ -205,7 +205,29 @@ Keep write-enabled apps small, auditable, and preferably local-only until you ad
 List JavaScript verbs from configured repositories:
 
 ```bash
-db-browser verbs list
+db-browser verbs list --fields path,repository,source,location --output table
+```
+
+With no config, environment variable, or CLI repository flag, `db-browser` scans only the embedded built-in repository. That repository is named `builtin`, has source `embedded`, and contains smoke/demo verbs such as:
+
+```text
+examples builtin hello
+examples builtin yaml-keys
+examples builtin tables
+examples builtin render-sample-table
+```
+
+Add more verb repositories with one of these sources:
+
+- `.db-browser.yml`;
+- `.db-browser.override.yml`;
+- `DB_BROWSER_VERB_REPOSITORIES`;
+- leading CLI flags `--repository` or `--verb-repository`.
+
+For example:
+
+```bash
+db-browser verbs --repository ./my-verbs list --output json
 ```
 
 Run one of the included examples from the repository:
