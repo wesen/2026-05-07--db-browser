@@ -1784,3 +1784,124 @@ Supported link examples:
 c.text("name").link(row => "/customers/" + row.id)
 c.text("name").link("/tables/{name}")
 ```
+
+## Step 22: Add Glazed help entries and wire them into the binary
+
+I added first-class CLI documentation in the Glazed help-entry format and embedded it into the `db-browser` binary. The binary now exposes `db-browser help getting-started`, `db-browser help user-guide`, and `db-browser help app-playbook` alongside the standard Cobra help output.
+
+The new playbook is intentionally written as handoff material for an LLM: it spells out runtime constraints, allowed modules, file layout, prompt templates, app patterns, validation checks, and common mistakes to reject.
+
+### Prompt Context
+
+**User prompt (verbatim):** "write a detailed documentation in the glazed help entries format for: 
+
+- getting-started 
+- user-guide
+- writing a set of example apps with db-browser (playbook/ tutorial style) that I can hand out to an LLM so that they can build full apps. 
+
+Add to binary."
+
+**Assistant interpretation:** Create Glazed help markdown pages for onboarding, reference usage, and LLM-oriented app generation, then embed and register those docs with the CLI root.
+
+**Inferred user intent:** Make the app self-documenting so users and coding agents can discover the intended db-browser workflow directly from the binary.
+
+**Commit (code):** pending — Glazed help docs.
+
+### What I did
+
+- Read the `glazed-help-page-authoring` skill and refreshed the Glazed help-entry conventions with `glaze help writing-help-entries`.
+- Added embedded documentation package:
+  - `internal/doc/doc.go`.
+- Added help entries:
+  - `internal/doc/tutorials/getting-started.md`;
+  - `internal/doc/topics/user-guide.md`;
+  - `internal/doc/applications/app-playbook.md`.
+- Wired the binary root command to:
+  - initialize Glazed logging flags;
+  - create a `help.NewHelpSystem()`;
+  - load embedded docs;
+  - call `help_cmd.SetupCobraRootCommand(...)`.
+- Added T14 to `tasks.md`.
+- Validated help rendering with:
+  - `go run ./cmd/db-browser help getting-started`;
+  - `go run ./cmd/db-browser help user-guide`;
+  - `go run ./cmd/db-browser help app-playbook`;
+  - `go run ./cmd/db-browser --help`.
+
+### Why
+
+- The user asked for documentation in Glazed help-entry format and explicitly asked to add it to the binary.
+- Embedded help makes the generated app patterns available at the point of use, including for humans and LLM agents that can call the CLI.
+
+### What worked
+
+- `go test ./...` passed after adding missing `go.sum` entries.
+- All three new help slugs rendered correctly from the binary.
+- Root help now advertises `db-browser help` topics and Glazed logging flags.
+
+### What didn't work
+
+- The first `go test ./...` after wiring Glazed help failed because transitive help/logging modules were missing from `go.sum`:
+
+```text
+missing go.sum entry for module providing package github.com/charmbracelet/glamour
+missing go.sum entry for module providing package github.com/adrg/frontmatter
+missing go.sum entry for module providing package github.com/kopoli/go-terminal-size
+missing go.sum entry for module providing package gopkg.in/natefinch/lumberjack.v2
+missing go.sum entry for module providing package github.com/charmbracelet/bubbletea
+missing go.sum entry for module providing package github.com/atotto/clipboard
+missing go.sum entry for module providing package github.com/charmbracelet/bubbles/list
+missing go.sum entry for module providing package github.com/charmbracelet/bubbles/viewport
+missing go.sum entry for module providing package github.com/charmbracelet/lipgloss
+```
+
+- Fix: ran:
+
+```bash
+go get github.com/go-go-golems/glazed/pkg/help@v1.2.5 \
+  github.com/go-go-golems/glazed/pkg/help/cmd@v1.2.5 \
+  github.com/go-go-golems/glazed/pkg/cmds/logging@v1.2.5
+```
+
+### What I learned
+
+- Glazed help wiring pulls in the interactive/rendering dependencies only once the binary imports the help packages directly, so `go.sum` needed a refresh even though `glazed` was already in `go.mod`.
+
+### What was tricky to build
+
+- The root command needed the Glazed help system setup, not just embedded markdown. Without `help_cmd.SetupCobraRootCommand`, the files would compile but not be discoverable through `db-browser help <slug>`.
+
+### What warrants a second pair of eyes
+
+- Review the playbook for LLM prompt quality: it is deliberately prescriptive and may need tightening once more example apps exist.
+- Review whether adding Glazed logging flags to the root command is acceptable CLI surface area for this early binary.
+
+### What should be done in the future
+
+- Add an automated test that constructs the root command and asserts the three help slugs render.
+- Add links from README to `db-browser help getting-started` and `db-browser help app-playbook`.
+
+### Code review instructions
+
+- Start with `internal/doc/applications/app-playbook.md`, then read `getting-started.md` and `user-guide.md`.
+- Review `cmd/db-browser/main.go` for help-system setup.
+- Validate with:
+
+```bash
+go test ./...
+go run ./cmd/db-browser help getting-started
+go run ./cmd/db-browser help user-guide
+go run ./cmd/db-browser help app-playbook
+```
+
+### Technical details
+
+Glazed help integration follows this pattern:
+
+```go
+helpSystem := help.NewHelpSystem()
+if err := doc.AddDocToHelpSystem(helpSystem); err != nil {
+    cobra.CheckErr(err)
+}
+help_cmd.SetupCobraRootCommand(helpSystem, root)
+```

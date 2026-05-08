@@ -114,7 +114,17 @@
 - [x] Use links in the Playwright smoke customer table and generic browser table list.
 - [x] Commit link support.
 
-### T14 — Browser automation follow-up
+### T14 — Glazed help documentation
+
+- [x] Add `getting-started` help entry in Glazed tutorial format.
+- [x] Add `user-guide` help entry in Glazed general-topic format.
+- [x] Add `app-playbook` tutorial/playbook for LLM-generated db-browser apps.
+- [x] Embed help markdown into the binary.
+- [x] Wire Glazed help into the Cobra root command.
+- [x] Validate `db-browser help getting-started`, `db-browser help user-guide`, and `db-browser help app-playbook`.
+- [x] Commit help documentation and binary wiring.
+
+### T15 — Browser automation follow-up
 
 - [ ] Add an automated Playwright test runner or script that asserts browser behavior without manual steps.
 - [ ] Check for console errors after navigation and interactions.

@@ -8,7 +8,11 @@ import (
 	"syscall"
 
 	"github.com/go-go-golems/db-browser/internal/app"
+	"github.com/go-go-golems/db-browser/internal/doc"
 	"github.com/go-go-golems/db-browser/internal/verbcli"
+	"github.com/go-go-golems/glazed/pkg/cmds/logging"
+	"github.com/go-go-golems/glazed/pkg/help"
+	help_cmd "github.com/go-go-golems/glazed/pkg/help/cmd"
 	"github.com/spf13/cobra"
 )
 
@@ -26,8 +30,20 @@ func newRootCommand() *cobra.Command {
 		Long: `db-browser is a Goja-backed playground for SQLite-focused web apps.
 
 It scans configured JavaScript verb repositories, exposes explicit __verb__
-functions as CLI commands, and will host Express-style database browser apps.`,
+functions as CLI commands, and hosts Express-style database browser apps.`,
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			return logging.InitLoggerFromCobra(cmd)
+		},
 	}
+
+	if err := logging.AddLoggingSectionToRootCommand(root, "db-browser"); err != nil {
+		cobra.CheckErr(err)
+	}
+	helpSystem := help.NewHelpSystem()
+	if err := doc.AddDocToHelpSystem(helpSystem); err != nil {
+		cobra.CheckErr(err)
+	}
+	help_cmd.SetupCobraRootCommand(helpSystem, root)
 
 	root.AddCommand(newServeCommand())
 	root.AddCommand(newInspectCommand())

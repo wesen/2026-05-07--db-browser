@@ -244,3 +244,20 @@ Added table cell link support and wired overview rows to detail pages.
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 21
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/014-retro-filter-smoke.sh — Link presence validation
 
+
+## 2026-05-07
+
+Added embedded Glazed help entries for getting started, user guide, and LLM app playbook.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-07--db-browser/cmd/db-browser/main.go — Glazed help wiring on Cobra root
+- /home/manuel/code/wesen/2026-05-07--db-browser/go.mod — Help integration dependency surface
+- /home/manuel/code/wesen/2026-05-07--db-browser/go.sum — Transitive help dependency checksums
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/doc/applications/app-playbook.md — LLM app generation playbook
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/doc/doc.go — Embedded help document loader
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/doc/topics/user-guide.md — User guide help topic
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/doc/tutorials/getting-started.md — Getting-started tutorial
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 22
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/tasks.md — Added T14 help documentation task
+
