@@ -89,6 +89,29 @@
 - [x] Upload refreshed bundle to reMarkable if requested.
 - [x] Commit final documentation refresh.
 
+### T11 — Functional filters and richer table rendering
+
+- [x] Add `features(f => f.filters())` to the table DSL.
+- [x] Parse `q`, `filter.<column>`, and `filter_<column>` query parameters into `ctx.filter`.
+- [x] Render a GET filter form with global and column-specific filter inputs.
+- [x] Apply filters, sorting, and pagination to static/fromRows tables.
+- [x] Add tests for filtering, sorting, pagination, money formatting, badges, and empty states.
+- [x] Commit functional table filters.
+
+### T12 — Retro Mac-style example UI
+
+- [ ] Add monochrome Macintosh/System 1 inspired CSS with muted accent colors.
+- [ ] Apply the CSS to the smoke/browser examples.
+- [ ] Make the examples more complex with search/filter state, metrics, and detail views.
+- [ ] Validate with curl, Go tests, and Playwright.
+- [ ] Commit the themed examples.
+
+### T13 — Browser automation follow-up
+
+- [ ] Add an automated Playwright test runner or script that asserts browser behavior without manual steps.
+- [ ] Check for console errors after navigation and interactions.
+- [ ] Commit automated browser validation.
+
 ## Completed research/design tasks
 
 - [x] Create docmgr ticket workspace.

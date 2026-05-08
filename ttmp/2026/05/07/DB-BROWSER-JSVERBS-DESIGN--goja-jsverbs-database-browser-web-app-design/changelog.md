@@ -201,3 +201,16 @@ Added seeded Playwright smoke DB/app and validated it in browser.
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/012-playwright-smoke.sh — Server smoke script for Playwright app
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/013-playwright-checklist.md — Manual Playwright validation checklist
 
+
+## 2026-05-07
+
+Added functional ui.table filters with static row filtering, sorting, pagination, and empty-state tests.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/uidsl/table.go — Functional filters and richer cell rendering
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/uidsl/table_filters_test.go — Filter behavior tests
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/uidsl/table_rich_test.go — Updated money formatting expectation
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 19
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/tasks.md — Added T11-T13
+

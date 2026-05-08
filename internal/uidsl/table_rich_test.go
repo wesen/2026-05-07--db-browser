@@ -40,7 +40,7 @@ func TestRichTableDataColumnsSortingAndPagination(t *testing.T) {
 	}
 	for _, want := range []string{
 		`<a href="?dir=desc&amp;page=1&amp;sort=id">Order</a>`,
-		`<td class="align-right" data-column="total">1200</td>`,
+		`<td class="align-right" data-column="total">$12.00</td>`,
 		`<nav class="ui-table-pagination">Page 2 of 3 (30 rows)`,
 		`<a href="?dir=asc&amp;page=1&amp;sort=id">Previous</a>`,
 		`<a href="?dir=asc&amp;page=3&amp;sort=id">Next</a>`,

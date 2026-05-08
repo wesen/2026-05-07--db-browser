@@ -1511,3 +1511,98 @@ go build -o /tmp/db-browser-playwright ./cmd/db-browser
   --addr :19090 \
   --dev
 ```
+
+## Step 19: Add functional table filters
+
+I started the new follow-up batch by turning the existing filter placeholders into working table behavior. Static and `fromRows` tables can now render filter controls, parse query parameters, reduce rows, sort rows, paginate the filtered set, and show an empty-state row when nothing matches.
+
+This gives the examples a real browser-visible interaction model before adding the retro visual design: users can type a global `q` search or per-column `filter.<column>` query values and get deterministic rendered results.
+
+### Prompt Context
+
+**User prompt (verbatim):** "add funcitonal filters, make more complex examples, and add CSS to make it look like a macos1 retro interface, monochrome with slight muted color accents. 
+
+Add tasks, conitnue implementing and committing at appropriate intervals, keeping a detailed diary"
+
+**Assistant interpretation:** Add new ticket tasks, then continue implementation in focused commits: table filters first, then richer retro-styled examples, while maintaining diary/changelog evidence.
+
+**Inferred user intent:** Move from a working vertical slice to a more usable DB browser prototype with filtering, richer examples, visual direction, and reviewable implementation history.
+
+**Commit (code):** pending — functional table filters.
+
+### What I did
+
+- Added T11–T13 to `tasks.md` for filters, retro examples, and browser automation follow-up.
+- Added `TableFeatures.Filters` and `features(f => f.filters())`.
+- Added `ColumnSpec.Filterable` and `c.text(...).filterable()` style column builder support.
+- Changed render context parsing so `ctx.filter` is built from:
+  - `q`;
+  - `filter.<column>`;
+  - `filter_<column>`.
+- For static/fromRows tables, added server-rendered behavior for:
+  - global search;
+  - per-column substring filters;
+  - sortable rows for declared sortable columns;
+  - pagination over filtered/sorted rows;
+  - empty-state row when nothing matches.
+- Added filter form rendering before the table.
+- Improved cell rendering for badges, tags, and money values.
+- Added `internal/uidsl/table_filters_test.go`.
+- Updated the rich-table test expectation for money formatting.
+
+### Why
+
+- The previous filter-related context existed only as a placeholder. The user explicitly asked for functional filters, so the first step was making the DSL and static rendering behavior real before updating examples.
+
+### What worked
+
+- `go test ./internal/uidsl -count=1` passed after updating expectations.
+- `go test ./...` passed.
+
+### What didn't work
+
+- The first test run failed because money columns now format cents as dollars:
+
+```text
+--- FAIL: TestRichTableDataColumnsSortingAndPagination (0.00s)
+    table_rich_test.go:49: missing "<td class=\"align-right\" data-column=\"total\">1200</td>" in ... <td class="align-right" data-column="total">$12.00</td> ...
+FAIL
+FAIL	github.com/go-go-golems/db-browser/internal/uidsl	0.004s
+```
+
+- Fix: updated the expected output in `internal/uidsl/table_rich_test.go` to `$12.00`.
+
+### What I learned
+
+- Functional filters are easiest to make deterministic for static/fromRows tables. Dynamic SQL-backed tables receive `ctx.filter` and can apply it in their own `data(ctx => ...)` callbacks.
+
+### What was tricky to build
+
+- The tricky boundary is avoiding surprise host-side SQL generation while still making filters functional. I kept static row filtering inside `ui.table` and left SQL-backed tables in control through the data callback. This avoids unsafe query construction and keeps the next SQL-helper feature explicit.
+
+### What warrants a second pair of eyes
+
+- Review whether the money column should always interpret values as cents. The current implementation does; if callers already have decimal strings, this may need an option.
+- Review the filter query naming convention (`filter.<column>` and `filter_<column>`) before it becomes a stable example contract.
+
+### What should be done in the future
+
+- Add a SQL helper that safely translates table sorting/filter/page context into parameterized SQLite queries.
+- Add row/cell link support so filtered result rows can link to detail pages.
+
+### Code review instructions
+
+- Start with `internal/uidsl/table.go`, especially `TableFeatures`, `TableBuilder.context`, `filterRows`, `sortRows`, `paginateRows`, and `filtersNode`.
+- Review `internal/uidsl/table_filters_test.go` for the intended contract.
+- Validate with `go test ./...`.
+
+### Technical details
+
+Supported filter query examples:
+
+```text
+?q=alice
+?filter.segment=vip
+?filter_name=alice
+?q=example&sort=id&dir=desc&page=1
+```

@@ -23,15 +23,17 @@ type TableFeatures struct {
 	Pagination   bool
 	Sorting      bool
 	ColumnPicker bool
+	Filters      bool
 	PageSize     int
 }
 
 type ColumnSpec struct {
-	Name     string
-	Label    string
-	Kind     string
-	Sortable bool
-	Align    string
+	Name       string
+	Label      string
+	Kind       string
+	Sortable   bool
+	Filterable bool
+	Align      string
 }
 
 type RenderContext struct {
@@ -104,6 +106,14 @@ func (t *TableBuilder) render(vm *goja.Runtime, input map[string]any) (Node, err
 	if err != nil {
 		return nil, err
 	}
+	if t.dataFn == nil {
+		rows = filterRows(rows, columns, ctx.Filter)
+		rows = sortRows(rows, columns, ctx.Order)
+		total = len(rows)
+		if t.features.Pagination {
+			rows = paginateRows(rows, ctx)
+		}
+	}
 	return t.node(ctx, rows, total, columns), nil
 }
 
@@ -130,7 +140,7 @@ func (t *TableBuilder) context(input map[string]any) RenderContext {
 		Query:  query,
 		Params: params,
 		State:  map[string]any{},
-		Filter: query,
+		Filter: filterMapFromQuery(query),
 		Page: map[string]any{
 			"index":  pageIndex,
 			"size":   pageSize,
@@ -146,7 +156,7 @@ func (t *TableBuilder) resolveColumns(vm *goja.Runtime, ctx RenderContext, rows 
 		cols := tableColumns(rows)
 		ret := make([]ColumnSpec, 0, len(cols))
 		for _, col := range cols {
-			ret = append(ret, ColumnSpec{Name: col, Label: col, Kind: "text"})
+			ret = append(ret, ColumnSpec{Name: col, Label: col, Kind: "text", Filterable: true})
 		}
 		return ret, nil
 	}
@@ -189,9 +199,14 @@ func (t *TableBuilder) node(ctx RenderContext, rows []map[string]any, total int,
 			if column.Align != "" {
 				attrs["class"] = "align-" + column.Align
 			}
-			cells = append(cells, &Element{Tag: "td", Attrs: attrs, Children: []Node{&Text{Value: formatCell(row[column.Name], column)}}})
+			cells = append(cells, &Element{Tag: "td", Attrs: attrs, Children: []Node{cellNode(row[column.Name], column)}})
 		}
 		bodyRows = append(bodyRows, &Element{Tag: "tr", Children: cells})
+	}
+	if len(bodyRows) == 0 {
+		bodyRows = append(bodyRows, &Element{Tag: "tr", Attrs: map[string]any{"class": "ui-table-empty-row"}, Children: []Node{
+			&Element{Tag: "td", Attrs: map[string]any{"class": "ui-table-empty", "colspan": len(columns)}, Children: []Node{&Text{Value: "No rows match the current filters."}}},
+		}})
 	}
 	attrs := map[string]any{"class": tableClass(t.features)}
 	if t.ID != "" {
@@ -201,10 +216,18 @@ func (t *TableBuilder) node(ctx RenderContext, rows []map[string]any, total int,
 		&Element{Tag: "thead", Children: []Node{&Element{Tag: "tr", Children: headCells}}},
 		&Element{Tag: "tbody", Children: bodyRows},
 	}}
-	if !t.features.Pagination {
-		return table
+	children := []Node{}
+	if t.features.Filters {
+		children = append(children, filtersNode(ctx, columns))
 	}
-	return &Fragment{Children: []Node{table, paginationNode(ctx, total)}}
+	children = append(children, table)
+	if t.features.Pagination {
+		children = append(children, paginationNode(ctx, total))
+	}
+	if len(children) == 1 {
+		return children[0]
+	}
+	return &Fragment{Children: children}
 }
 
 func featureBuilderObject(vm *goja.Runtime, features *TableFeatures) goja.Value {
@@ -217,6 +240,7 @@ func featureBuilderObject(vm *goja.Runtime, features *TableFeatures) goja.Value 
 		return obj
 	})
 	_ = obj.Set("sorting", func(_ ...any) goja.Value { features.Sorting = true; return obj })
+	_ = obj.Set("filters", func(_ ...any) goja.Value { features.Filters = true; return obj })
 	_ = obj.Set("columnPicker", func(_ ...any) goja.Value { features.ColumnPicker = true; return obj })
 	return obj
 }
@@ -239,6 +263,7 @@ func columnObject(vm *goja.Runtime, col *ColumnSpec, columns *[]ColumnSpec) goja
 	obj := vm.NewObject()
 	_ = obj.Set("label", func(label string) goja.Value { col.Label = label; return obj })
 	_ = obj.Set("sortable", func(_ ...any) goja.Value { col.Sortable = true; return obj })
+	_ = obj.Set("filterable", func(_ ...any) goja.Value { col.Filterable = true; return obj })
 	_ = obj.Set("align", func(align string) goja.Value { col.Align = align; return obj })
 	_ = obj.Set("mono", func(_ ...any) goja.Value { return obj })
 	_ = obj.Set("truncate", func(_ ...any) goja.Value { return obj })
@@ -354,7 +379,7 @@ func columnsFromExport(exported any) []ColumnSpec {
 			if name == "" {
 				continue
 			}
-			ret = append(ret, ColumnSpec{Name: name, Label: stringFromAny(m["label"]), Kind: stringFromAny(m["kind"]), Sortable: boolFromAny(m["sortable"]), Align: stringFromAny(m["align"])})
+			ret = append(ret, ColumnSpec{Name: name, Label: stringFromAny(m["label"]), Kind: stringFromAny(m["kind"]), Sortable: boolFromAny(m["sortable"]), Filterable: boolFromAny(m["filterable"]), Align: stringFromAny(m["align"])})
 		}
 	}
 	return ret
@@ -370,6 +395,9 @@ func tableClass(features TableFeatures) []any {
 	}
 	if features.ColumnPicker {
 		classes = append(classes, "ui-table--column-picker")
+	}
+	if features.Filters {
+		classes = append(classes, "ui-table--filters")
 	}
 	return classes
 }
@@ -391,11 +419,178 @@ func paginationNode(ctx RenderContext, total int) Node {
 	return &Element{Tag: "nav", Attrs: map[string]any{"class": "ui-table-pagination"}, Children: children}
 }
 
+func cellNode(value any, col ColumnSpec) Node {
+	text := formatCell(value, col)
+	switch col.Kind {
+	case "badge":
+		return &Element{Tag: "span", Attrs: map[string]any{"class": []any{"ui-badge", "ui-badge--" + cssToken(text)}}, Children: []Node{&Text{Value: text}}}
+	case "tags":
+		parts := splitTags(value)
+		children := make([]Node, 0, len(parts))
+		for i, part := range parts {
+			if i > 0 {
+				children = append(children, &Text{Value: " "})
+			}
+			children = append(children, &Element{Tag: "span", Attrs: map[string]any{"class": []any{"ui-tag", "ui-tag--" + cssToken(part)}}, Children: []Node{&Text{Value: part}}})
+		}
+		return &Fragment{Children: children}
+	default:
+		return &Text{Value: text}
+	}
+}
+
 func formatCell(value any, col ColumnSpec) string {
 	if value == nil {
 		return ""
 	}
+	if col.Kind == "money" {
+		cents := intFromAny(value, 0)
+		return fmt.Sprintf("$%d.%02d", cents/100, absInt(cents%100))
+	}
 	return fmt.Sprint(value)
+}
+
+func filtersNode(ctx RenderContext, columns []ColumnSpec) Node {
+	children := []Node{}
+	for _, key := range []string{"sort", "dir"} {
+		if value := stringFromAny(ctx.Query[key]); value != "" {
+			children = append(children, &Element{Tag: "input", Attrs: map[string]any{"type": "hidden", "name": key, "value": value}})
+		}
+	}
+	children = append(children,
+		&Element{Tag: "label", Children: []Node{&Text{Value: "Search "}, &Element{Tag: "input", Attrs: map[string]any{"type": "search", "name": "q", "value": stringFromAny(ctx.Filter["q"]), "placeholder": "all columns"}}}},
+	)
+	for _, column := range columns {
+		if !column.Filterable {
+			continue
+		}
+		label := column.Label
+		if label == "" {
+			label = column.Name
+		}
+		name := "filter." + column.Name
+		children = append(children, &Element{Tag: "label", Children: []Node{&Text{Value: label + " "}, &Element{Tag: "input", Attrs: map[string]any{"type": "search", "name": name, "value": stringFromAny(ctx.Filter[column.Name])}}}})
+	}
+	children = append(children,
+		&Element{Tag: "button", Attrs: map[string]any{"type": "submit"}, Children: []Node{&Text{Value: "Filter"}}},
+		&Text{Value: " "},
+		&Element{Tag: "a", Attrs: map[string]any{"href": "?"}, Children: []Node{&Text{Value: "Clear"}}},
+	)
+	return &Element{Tag: "form", Attrs: map[string]any{"class": "ui-table-filters", "method": "get"}, Children: children}
+}
+
+func filterRows(rows []map[string]any, columns []ColumnSpec, filter map[string]any) []map[string]any {
+	if len(filter) == 0 {
+		return rows
+	}
+	q := strings.ToLower(strings.TrimSpace(stringFromAny(filter["q"])))
+	out := make([]map[string]any, 0, len(rows))
+	for _, row := range rows {
+		if q != "" {
+			matched := false
+			for _, column := range columns {
+				if strings.Contains(strings.ToLower(fmt.Sprint(row[column.Name])), q) {
+					matched = true
+					break
+				}
+			}
+			if !matched {
+				continue
+			}
+		}
+		ok := true
+		for _, column := range columns {
+			want := strings.ToLower(strings.TrimSpace(stringFromAny(filter[column.Name])))
+			if want == "" {
+				continue
+			}
+			if !strings.Contains(strings.ToLower(fmt.Sprint(row[column.Name])), want) {
+				ok = false
+				break
+			}
+		}
+		if ok {
+			out = append(out, row)
+		}
+	}
+	return out
+}
+
+func sortRows(rows []map[string]any, columns []ColumnSpec, order map[string]any) []map[string]any {
+	key := stringFromAny(order["key"])
+	if key == "" {
+		return rows
+	}
+	allowed := false
+	for _, column := range columns {
+		if column.Name == key && column.Sortable {
+			allowed = true
+			break
+		}
+	}
+	if !allowed {
+		return rows
+	}
+	desc := stringFromAny(order["dir"]) == "desc"
+	out := append([]map[string]any(nil), rows...)
+	sort.SliceStable(out, func(i, j int) bool {
+		cmp := compareAny(out[i][key], out[j][key])
+		if desc {
+			return cmp > 0
+		}
+		return cmp < 0
+	})
+	return out
+}
+
+func paginateRows(rows []map[string]any, ctx RenderContext) []map[string]any {
+	limit := intFromAny(ctx.Page["limit"], 25)
+	offset := intFromAny(ctx.Page["offset"], 0)
+	if limit <= 0 || offset >= len(rows) {
+		if offset >= len(rows) {
+			return []map[string]any{}
+		}
+		return rows
+	}
+	end := offset + limit
+	if end > len(rows) {
+		end = len(rows)
+	}
+	return rows[offset:end]
+}
+
+func compareAny(a, b any) int {
+	af, aok := numeric(a)
+	bf, bok := numeric(b)
+	if aok && bok {
+		switch {
+		case af < bf:
+			return -1
+		case af > bf:
+			return 1
+		default:
+			return 0
+		}
+	}
+	as := strings.ToLower(fmt.Sprint(a))
+	bs := strings.ToLower(fmt.Sprint(b))
+	return strings.Compare(as, bs)
+}
+
+func numeric(v any) (float64, bool) {
+	switch x := v.(type) {
+	case int:
+		return float64(x), true
+	case int64:
+		return float64(x), true
+	case float64:
+		return x, true
+	case string:
+		f, err := strconv.ParseFloat(x, 64)
+		return f, err == nil
+	default:
+		return 0, false
+	}
 }
 
 func queryHref(query map[string]any, updates map[string]any) string {
@@ -414,6 +609,79 @@ func queryHref(query map[string]any, updates map[string]any) string {
 		return "?"
 	}
 	return "?" + encoded
+}
+
+func filterMapFromQuery(query map[string]any) map[string]any {
+	ret := map[string]any{}
+	if q := strings.TrimSpace(stringFromAny(query["q"])); q != "" {
+		ret["q"] = q
+	}
+	for key, value := range query {
+		if value == nil || strings.TrimSpace(stringFromAny(value)) == "" {
+			continue
+		}
+		if strings.HasPrefix(key, "filter.") {
+			ret[strings.TrimPrefix(key, "filter.")] = value
+		}
+		if strings.HasPrefix(key, "filter_") {
+			ret[strings.TrimPrefix(key, "filter_")] = value
+		}
+	}
+	return ret
+}
+
+func splitTags(value any) []string {
+	switch v := value.(type) {
+	case []any:
+		parts := make([]string, 0, len(v))
+		for _, item := range v {
+			if s := strings.TrimSpace(fmt.Sprint(item)); s != "" {
+				parts = append(parts, s)
+			}
+		}
+		return parts
+	case []string:
+		return v
+	default:
+		text := fmt.Sprint(value)
+		fields := strings.FieldsFunc(text, func(r rune) bool { return r == ',' || r == ';' })
+		parts := []string{}
+		for _, field := range fields {
+			if s := strings.TrimSpace(field); s != "" {
+				parts = append(parts, s)
+			}
+		}
+		return parts
+	}
+}
+
+func cssToken(value string) string {
+	value = strings.ToLower(strings.TrimSpace(value))
+	var b strings.Builder
+	lastDash := false
+	for _, r := range value {
+		if (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9') {
+			b.WriteRune(r)
+			lastDash = false
+			continue
+		}
+		if !lastDash {
+			b.WriteByte('-')
+			lastDash = true
+		}
+	}
+	ret := strings.Trim(b.String(), "-")
+	if ret == "" {
+		return "empty"
+	}
+	return ret
+}
+
+func absInt(v int) int {
+	if v < 0 {
+		return -v
+	}
+	return v
 }
 
 func mapFromAny(value any) map[string]any {
