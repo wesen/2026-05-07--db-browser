@@ -1905,3 +1905,86 @@ if err := doc.AddDocToHelpSystem(helpSystem); err != nil {
 }
 help_cmd.SetupCobraRootCommand(helpSystem, root)
 ```
+
+## Step 23: Add top-level README with cropped screenshot
+
+I added a top-level README that presents the project as a usable tool rather than only a ticket implementation. It includes a properly cropped screenshot of the retro seeded app, quick-start commands, a minimal script example, module reference, example index, embedded help commands, validation scripts, and safety notes.
+
+The screenshot was captured from the Playwright smoke app at a fixed viewport and cropped to the application window so the README shows the UI clearly without excess browser/background whitespace.
+
+### Prompt Context
+
+**User prompt (verbatim):** "Add a nice README.md with screenshot too (make sure to properly crop it)"
+
+**Assistant interpretation:** Add polished top-level project documentation and include a cropped visual screenshot of the current retro UI.
+
+**Inferred user intent:** Make the repository presentable and immediately understandable to users/reviewers who land on the project page.
+
+**Commit (code):** pending — README and screenshot.
+
+### What I did
+
+- Started the seeded retro smoke app with `db-browser serve` on port `19093`.
+- Captured a Playwright screenshot at `1000x680`.
+- Cropped the image from `1000x680` to `976x590`, removing the excess lower background while preserving the full retro window and shadow.
+- Saved the cropped screenshot as `docs/assets/db-browser-retro-smoke.png`.
+- Added top-level `README.md` with:
+  - project summary;
+  - screenshot;
+  - quick start;
+  - minimal app script;
+  - module table;
+  - example list;
+  - embedded help commands;
+  - validation scripts;
+  - safety notes;
+  - project status.
+- Added T15 to `tasks.md`.
+
+### Why
+
+- A README plus screenshot makes the current prototype easy to understand without reading the ticket docs first.
+- The cropped screenshot documents the current visual direction: monochrome retro Macintosh/System-1-style server-rendered UI.
+
+### What worked
+
+- The app served successfully and produced a screenshot.
+- Cropping generated a compact `64K` PNG at `976x590`.
+- `go test ./...` passed.
+
+### What didn't work
+
+- N/A in this step.
+
+### What I learned
+
+- The retro UI reads well as a README screenshot when cropped to the window boundaries rather than showing the full tall page background.
+
+### What was tricky to build
+
+- The main detail was cropping enough to remove dead space while keeping the titlebar, window border, shadow, table, and pagination visible. I kept a small margin around the app window for context.
+
+### What warrants a second pair of eyes
+
+- Review the README tone and decide whether to keep mentioning the ticket workspace validation scripts in the public-facing README.
+
+### What should be done in the future
+
+- Add an automated screenshot regeneration script once Playwright automation is formalized.
+- Add README badges once CI exists.
+
+### Code review instructions
+
+- Start with `README.md`.
+- Open `docs/assets/db-browser-retro-smoke.png` and confirm the crop is visually useful.
+- Validate with `go test ./...`.
+
+### Technical details
+
+Screenshot capture and crop details:
+
+```text
+Original: 1000x680
+Crop:     976x590
+Path:     docs/assets/db-browser-retro-smoke.png
+```

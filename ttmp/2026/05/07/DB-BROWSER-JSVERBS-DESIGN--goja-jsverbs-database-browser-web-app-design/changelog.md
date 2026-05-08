@@ -261,3 +261,15 @@ Added embedded Glazed help entries for getting started, user guide, and LLM app 
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 22
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/tasks.md — Added T14 help documentation task
 
+
+## 2026-05-07
+
+Added top-level README with cropped retro UI screenshot.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-07--db-browser/README.md — Project overview and quick-start documentation
+- /home/manuel/code/wesen/2026-05-07--db-browser/docs/assets/db-browser-retro-smoke.png — Cropped README screenshot
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 23
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/tasks.md — Added README/screenshot task
+

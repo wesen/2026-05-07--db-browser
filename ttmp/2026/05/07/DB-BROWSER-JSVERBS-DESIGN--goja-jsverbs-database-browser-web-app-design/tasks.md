@@ -124,7 +124,14 @@
 - [x] Validate `db-browser help getting-started`, `db-browser help user-guide`, and `db-browser help app-playbook`.
 - [x] Commit help documentation and binary wiring.
 
-### T15 — Browser automation follow-up
+### T15 — README and screenshot
+
+- [x] Capture the retro seeded app in Playwright.
+- [x] Crop the screenshot to the app window.
+- [x] Add a top-level README with project overview, screenshot, quick start, examples, help docs, validation, and safety notes.
+- [x] Commit README and screenshot.
+
+### T16 — Browser automation follow-up
 
 - [ ] Add an automated Playwright test runner or script that asserts browser behavior without manual steps.
 - [ ] Check for console errors after navigation and interactions.
