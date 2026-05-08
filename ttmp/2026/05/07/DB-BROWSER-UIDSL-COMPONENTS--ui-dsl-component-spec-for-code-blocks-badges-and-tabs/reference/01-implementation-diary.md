@@ -405,3 +405,122 @@ Ticket path:
 ```text
 ttmp/2026/05/07/DB-BROWSER-UIDSL-COMPONENTS--ui-dsl-component-spec-for-code-blocks-badges-and-tabs
 ```
+
+## Step 2: Implement codeBlock, badge, and tabs core components
+
+I implemented the three requested components in the UI DSL core and registered them with the Goja module loader. The implementation keeps the components server-rendered and safe by default: source code, badge values, labels, and string tab content are represented as `Text` nodes and therefore go through the existing HTML escaping renderer.
+
+I implemented the three components in one focused pass because they share helper code for options, token normalization, and node composition. The tests cover render contracts, escaping, aliases, duplicate tab IDs, disabled tabs, and selected-tab fallback behavior.
+
+### Prompt Context
+
+**User prompt (verbatim):** "continue"
+
+**Assistant interpretation:** Continue after planning by implementing the component tasks step by step, with validation, diary updates, and commits.
+
+**Inferred user intent:** Move from the implementation guide into working code while preserving the ticket workflow.
+
+**Commit (code):** pending — core component implementation.
+
+### What I did
+
+- Added `internal/uidsl/components.go`.
+- Registered new exports in `internal/uidsl/module.go`:
+  - `ui.codeBlock`;
+  - `ui.sql`;
+  - `ui.js`;
+  - `ui.jsonBlock`;
+  - `ui.badge`;
+  - `ui.tabs`.
+- Added `internal/uidsl/components_test.go`.
+- Implemented code block options:
+  - `title`;
+  - `lineNumbers`;
+  - `wrap` defaulting to true;
+  - `copy`;
+  - `maxHeight`;
+  - `class`.
+- Implemented badge options:
+  - `tone` with fallback to `default`;
+  - `title`;
+  - `class`.
+- Implemented CSS-only radio tab markup with:
+  - normalized container/tab IDs;
+  - duplicate tab suffixes;
+  - selected tab resolution by id/index;
+  - disabled tabs;
+  - content normalization through `NormalizeExport`.
+
+### Why
+
+- These components are required for inspection/debug pages and reduce unsafe ad hoc use of `ui.raw` for SQL, JSON, and request/database text.
+
+### What worked
+
+- `go test ./internal/uidsl -count=1` passed.
+- `go test ./...` passed.
+
+### What didn't work
+
+- The first test run failed in three places:
+
+```text
+--- FAIL: TestCodeBlockAliasesAndJSON
+missing "&quot;a&quot;: &quot;&lt;x&gt;&quot;" ... actual JSON used &#34; and \u003c escaping
+
+--- FAIL: TestTabsRenderSelectedDuplicateDisabledAndEscaped
+missing checked attribute substring because renderer sorts boolean attributes first
+
+--- FAIL: TestTabsInvalidSelectionFallsBack
+same checked-attribute ordering issue
+```
+
+- Fixes:
+  - Updated JSON expectations to match Go's safe JSON escaping (`\u003c`) plus HTML numeric quote escaping (`&#34;`).
+  - Updated checked-radio assertions to match the renderer's sorted boolean attribute output.
+
+### What I learned
+
+- JSON pretty printing through Go's encoder escapes `<` as `\u003c`, which is desirable for HTML safety but should be documented/expected in tests.
+- The renderer sorts attributes and renders boolean attributes before string attributes when their key sorts first, so exact render-contract tests need to account for that deterministic ordering.
+
+### What was tricky to build
+
+- The main tricky part was tabs content normalization. Goja exports UI nodes as Go values, strings as strings, and arrays as `[]any`; the implementation uses the existing `NormalizeExport` path so it stays consistent with the rest of the DSL.
+
+### What warrants a second pair of eyes
+
+- Review `jsonBlock` formatting expectations. It currently uses Go JSON marshal indentation and therefore escapes `<`, `>`, and `&` as unicode sequences.
+- Review whether `ui.badge(nil)` should render an empty badge or a textual fallback such as `unknown`.
+- Review whether `lineNumbers` should eventually produce per-line markup instead of only a class.
+
+### What should be done in the future
+
+- Update examples to use the new components.
+- Update `js-api-reference` and `user-guide`.
+- Add component smoke script.
+
+### Code review instructions
+
+- Start with `internal/uidsl/components.go`.
+- Review `internal/uidsl/module.go` for export wiring.
+- Review `internal/uidsl/components_test.go` for the public JS API contract.
+- Validate with:
+
+```bash
+go test ./internal/uidsl -count=1
+go test ./...
+```
+
+### Technical details
+
+Example API now implemented:
+
+```js
+ui.codeBlock("sql", row.sql, { title: row.name, lineNumbers: true, copy: true })
+ui.badge(row.type, { tone: "info" })
+ui.tabs("record-tabs", [
+  { id: "sql", label: "SQL", content: ui.sql(row.sql) },
+  { id: "json", label: "JSON", content: ui.jsonBlock(row) },
+])
+```

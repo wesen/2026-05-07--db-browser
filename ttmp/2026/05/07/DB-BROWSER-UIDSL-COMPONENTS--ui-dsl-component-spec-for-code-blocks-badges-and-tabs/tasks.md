@@ -13,36 +13,36 @@
 
 ### T02 — `ui.codeBlock` and convenience aliases
 
-- [ ] Add `internal/uidsl/components.go` or equivalent focused component file.
-- [ ] Implement `ui.codeBlock(language, source, options?)`.
-- [ ] Implement `ui.sql(source, options?)`.
-- [ ] Implement `ui.js(source, options?)`.
-- [ ] Implement `ui.jsonBlock(value, options?)` with pretty-print behavior.
-- [ ] Normalize language tokens and default invalid/empty language to `text`.
-- [ ] Support `title`, `lineNumbers`, `wrap`, `copy`, `maxHeight`, and `class` options.
-- [ ] Add escaping and render-contract tests.
-- [ ] Commit codeBlock implementation.
+- [x] Add `internal/uidsl/components.go` or equivalent focused component file.
+- [x] Implement `ui.codeBlock(language, source, options?)`.
+- [x] Implement `ui.sql(source, options?)`.
+- [x] Implement `ui.js(source, options?)`.
+- [x] Implement `ui.jsonBlock(value, options?)` with pretty-print behavior.
+- [x] Normalize language tokens and default invalid/empty language to `text`.
+- [x] Support `title`, `lineNumbers`, `wrap`, `copy`, `maxHeight`, and `class` options.
+- [x] Add escaping and render-contract tests.
+- [x] Commit codeBlock implementation.
 
 ### T03 — `ui.badge`
 
-- [ ] Implement `ui.badge(value, options?)`.
-- [ ] Support `tone`, `title`, and `class` options.
-- [ ] Normalize tone and value CSS tokens.
-- [ ] Ensure unknown tone falls back to `default`.
-- [ ] Add escaping, tone, and class tests.
-- [ ] Commit badge implementation.
+- [x] Implement `ui.badge(value, options?)`.
+- [x] Support `tone`, `title`, and `class` options.
+- [x] Normalize tone and value CSS tokens.
+- [x] Ensure unknown tone falls back to `default`.
+- [x] Add escaping, tone, and class tests.
+- [x] Commit badge implementation.
 
 ### T04 — `ui.tabs`
 
-- [ ] Implement `ui.tabs(id, tabs, options?)`.
-- [ ] Render CSS-only radio tab markup, or document and test a `<details>` fallback if needed.
-- [ ] Normalize container and tab IDs.
-- [ ] Suffix duplicate tab IDs.
-- [ ] Resolve selected tab by id or index, falling back to first non-disabled tab.
-- [ ] Render disabled tab labels safely and unselectably.
-- [ ] Normalize tab content through existing UI node normalization.
-- [ ] Add tests for selected/disabled/duplicate/escaping behavior.
-- [ ] Commit tabs implementation.
+- [x] Implement `ui.tabs(id, tabs, options?)`.
+- [x] Render CSS-only radio tab markup, or document and test a `<details>` fallback if needed.
+- [x] Normalize container and tab IDs.
+- [x] Suffix duplicate tab IDs.
+- [x] Resolve selected tab by id or index, falling back to first non-disabled tab.
+- [x] Render disabled tab labels safely and unselectably.
+- [x] Normalize tab content through existing UI node normalization.
+- [x] Add tests for selected/disabled/duplicate/escaping behavior.
+- [x] Commit tabs implementation.
 
 ### T05 — Example integration
 

@@ -34,6 +34,28 @@ func Loader(vm *goja.Runtime, moduleObj *goja.Object) {
 	_ = exports.Set("raw", func(s string) *RawHTML { return &RawHTML{Value: s} })
 	_ = exports.Set("render", func(v goja.Value) (string, error) { return RenderAny(vm, v) })
 	_ = exports.Set("page", func(call goja.FunctionCall) goja.Value { return vm.ToValue(pageFromCall(call)) })
+	_ = exports.Set("codeBlock", func(language string, source goja.Value, options ...map[string]any) goja.Value {
+		return vm.ToValue(codeBlockNode(language, source.Export(), firstOptions(options)))
+	})
+	_ = exports.Set("sql", func(source goja.Value, options ...map[string]any) goja.Value {
+		return vm.ToValue(codeBlockNode("sql", source.Export(), firstOptions(options)))
+	})
+	_ = exports.Set("js", func(source goja.Value, options ...map[string]any) goja.Value {
+		return vm.ToValue(codeBlockNode("javascript", source.Export(), firstOptions(options)))
+	})
+	_ = exports.Set("jsonBlock", func(value goja.Value, options ...map[string]any) goja.Value {
+		return vm.ToValue(codeBlockNode("json", jsonBlockSource(value), firstOptions(options)))
+	})
+	_ = exports.Set("badge", func(value goja.Value, options ...map[string]any) goja.Value {
+		return vm.ToValue(badgeNode(value.Export(), firstOptions(options)))
+	})
+	_ = exports.Set("tabs", func(id string, tabs goja.Value, options ...map[string]any) (goja.Value, error) {
+		n, err := tabsNode(id, tabs, firstOptions(options))
+		if err != nil {
+			return nil, err
+		}
+		return vm.ToValue(n), nil
+	})
 	tableValue := vm.ToValue(func(id string) goja.Value { return tableBuilderObject(vm, newTableBuilder(id)) })
 	if tableObj, ok := tableValue.(*goja.Object); ok {
 		_ = tableObj.Set("fromRows", func(id string, rows goja.Value) (goja.Value, error) {
