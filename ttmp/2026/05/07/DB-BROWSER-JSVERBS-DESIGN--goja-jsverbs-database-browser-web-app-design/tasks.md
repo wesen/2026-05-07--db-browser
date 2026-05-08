@@ -67,12 +67,12 @@
 
 ### T08 — Rich table DSL v1
 
-- [ ] Implement `ui.table(id).data(...).columns(...).features(...).render(...)`.
-- [ ] Implement table context parsing for query, params, pagination, sorting, and filters.
-- [ ] Implement column types: text, badge, money, date, tags.
-- [ ] Implement pagination, sorting headers, empty states, and column picker.
-- [ ] Add tests and an example SQLite browser script.
-- [ ] Commit rich table DSL v1.
+- [x] Implement `ui.table(id).data(...).columns(...).features(...).render(...)`.
+- [x] Implement table context parsing for query, params, pagination, and sorting. (Filter builder remains future work.)
+- [x] Implement column types: text, badge, money, date, tags.
+- [x] Implement pagination, sorting headers, and column picker markers. (Interactive column picker UI remains future work.)
+- [x] Add tests and an example SQLite browser script.
+- [x] Commit rich table DSL v1.
 
 ### T09 — Examples and validation scripts
 

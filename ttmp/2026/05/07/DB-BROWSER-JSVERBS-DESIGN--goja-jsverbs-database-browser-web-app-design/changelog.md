@@ -149,3 +149,17 @@ Wired copied Express host into db-browser serve command with SQLite and ui.dsl m
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 14
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/008-serve-tests.sh — Serve validation script
 
+
+## 2026-05-07
+
+Expanded ui.table into rich DSL v1 and added generic browser smoke example.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-07--db-browser/examples/generic-browser/README.md — Example run instructions
+- /home/manuel/code/wesen/2026-05-07--db-browser/examples/generic-browser/scripts/app.js — Serve-mode generic SQLite browser example
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/uidsl/table.go — Rich table DSL v1 implementation
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/uidsl/table_rich_test.go — Rich table behavior tests
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 15
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/009-rich-table-tests.sh — Rich table smoke validation script
+

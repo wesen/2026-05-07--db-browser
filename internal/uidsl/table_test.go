@@ -29,10 +29,10 @@ func TestTableFromRowsRendersEscapedHTMLTable(t *testing.T) {
 	}
 	for _, want := range []string{
 		`<table class="ui-table ui-table--pagination ui-table--sorting ui-table--column-picker" id="people">`,
-		`<th>name</th>`,
-		`<th>note</th>`,
-		`<td>Alice</td>`,
-		`<td>&lt;admin&gt;</td>`,
+		`<th data-column="name">name</th>`,
+		`<th data-column="note">note</th>`,
+		`<td data-column="name">Alice</td>`,
+		`<td data-column="note">&lt;admin&gt;</td>`,
 	} {
 		if !strings.Contains(html, want) {
 			t.Fatalf("rendered table missing %q in %s", want, html)

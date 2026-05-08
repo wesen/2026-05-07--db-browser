@@ -1182,3 +1182,88 @@ Validation command:
 ```bash
 ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/008-serve-tests.sh
 ```
+
+## Step 15: Expand `ui.table` into rich table DSL v1
+
+I expanded the initial table primitive into a richer v1 table DSL. It now supports `data` callbacks, `columns` callbacks, table render context parsing, declared column kinds, sortable header links, pagination navigation, feature classes, and a generic SQLite browser example served through the web host.
+
+### Prompt Context
+
+**User prompt (verbatim):** "go ahead."
+
+**Assistant interpretation:** Continue with the next queued task, T08, and keep committing and documenting progress.
+
+**Inferred user intent:** Move beyond the minimal `fromRows` table toward the richer data-table DSL from the design guide.
+
+**Commit (code):** pending — rich table DSL v1.
+
+### What I did
+
+- Reworked `internal/uidsl/table.go` to support:
+  - `ui.table(id).data(fn).columns(fn).features(fn).render(ctx)`;
+  - `ui.table.fromRows(id, rows)` compatibility;
+  - render context maps for `query`, `params`, `page`, `order`, `state`, and `filter`;
+  - column builder methods: `text`, `badge`, `money`, `date`, `tags`;
+  - column modifiers: `label`, `sortable`, `align`, plus no-op `mono`, `truncate`, and `link` placeholders;
+  - pagination nav with previous/next links;
+  - sortable header links that preserve query state;
+  - deterministic row/column normalization across Goja exported arrays and Go slices.
+- Added `internal/uidsl/table_rich_test.go`.
+- Updated `internal/uidsl/table_test.go` expectations for `data-column` attributes.
+- Added `examples/generic-browser/scripts/app.js`.
+- Added `examples/generic-browser/README.md`.
+- Added `scripts/009-rich-table-tests.sh`, which builds a binary, creates a temporary SQLite DB, serves the example app, fetches the HTML page, and checks for the rendered table and fixture table name.
+- Ran:
+  - `scripts/007-uidsl-table-tests.sh`
+  - `scripts/008-serve-tests.sh`
+  - `scripts/009-rich-table-tests.sh`
+  - `go test ./...`
+
+### Why
+
+- The user-requested DB browser needs the host/DSL to own repetitive table mechanics. This is the first functional slice of that: data callbacks receive paging/sorting context, columns are declared in the DSL, and the renderer produces consistent HTML.
+
+### What worked
+
+- Rich table unit tests pass.
+- The generic browser example can be served with `db-browser serve` and renders a table containing the temporary SQLite `people` table.
+- `go test ./...` passes.
+
+### What didn't work
+
+- The first generic-browser smoke script left an orphaned process because `go run ... &` backgrounds the Go tool wrapper rather than a stable built binary in all cases. I fixed the script by building a temporary binary first and running that binary in the background.
+- The first generic-browser rendered an empty table body because `go-go-goja/modules/database` exported rows as a Go slice shape, not always `[]any`. I fixed `rowsFromExport` to use reflection for arbitrary slices/arrays and map-like rows.
+
+### What I learned
+
+- Goja export shapes are not uniform across pure JS arrays and Go-returned slices. DSL boundary code should normalize with reflection rather than assuming `[]any`.
+- Ticket smoke scripts that manage long-running servers should build a temporary binary and trap/kill the binary process, not `go run`.
+
+### What was tricky to build
+
+- The JS chain `c.text("id").label("Order").sortable().badge("status")...` requires column objects to also expose the builder's column-creation methods. I added those methods to column objects so users can write the compact chained style from the design guide.
+
+### What warrants a second pair of eyes
+
+- Filtering and row actions are still future work; this v1 covers context, data, columns, pagination, and sorting links.
+- Column kinds currently affect metadata/classes only lightly; formatting for money/date/tags should be expanded in T08 follow-up or T09 examples.
+
+### What should be done in the future
+
+- Add filter builder APIs and row action rendering.
+- Add real client/server behavior for column picker rather than only marker classes.
+- Decide whether empty DB result sets should normalize to `[]` at the database module boundary.
+
+### Code review instructions
+
+- Start with `internal/uidsl/table.go`.
+- Review `internal/uidsl/table_rich_test.go` for the supported DSL shape.
+- Run `ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/009-rich-table-tests.sh`.
+
+### Technical details
+
+Generic browser smoke command is encoded in:
+
+```bash
+ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/009-rich-table-tests.sh
+```
