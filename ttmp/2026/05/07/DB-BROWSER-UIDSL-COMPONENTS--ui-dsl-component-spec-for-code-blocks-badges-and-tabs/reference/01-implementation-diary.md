@@ -524,3 +524,84 @@ ui.tabs("record-tabs", [
   { id: "json", label: "JSON", content: ui.jsonBlock(row) },
 ])
 ```
+
+## Step 3: Integrate components into the generic browser example
+
+I updated the generic SQLite browser example so the new components are visible in a realistic inspection page. The table detail route now uses a schema type badge, CSS-only tabs, a SQL code block, and a JSON debug payload block alongside the existing columns and rows tables.
+
+I also added a ticket-local smoke script that builds the binary, creates a temporary SQLite database, serves the generic browser, fetches a detail page, and checks for the component classes and schema SQL.
+
+### Prompt Context
+
+**User prompt (verbatim):** (same as Step 2)
+
+**Assistant interpretation:** Continue the component implementation sequence with example integration and validation.
+
+**Inferred user intent:** Demonstrate that the new components work in a real db-browser page, not just unit tests.
+
+**Commit (code):** pending — example integration.
+
+### What I did
+
+- Updated `examples/generic-browser/scripts/app.js`.
+- The `/tables/:name` route now renders:
+  - `ui.badge(schema.type, ...)`;
+  - `ui.tabs("table-detail-tabs", ...)`;
+  - `ui.sql(schema.sql, { title, lineNumbers, copy, wrap, maxHeight })`;
+  - `ui.jsonBlock({ schema, columns, sampleRows }, ...)`.
+- Added retro CSS classes for:
+  - `.ui-codeblock*`;
+  - `.ui-tabs*`;
+  - additional `.ui-badge--tone` variants.
+- Added `scripts/001-uidsl-components-smoke.sh` under the ticket.
+
+### Why
+
+- The colleague's spec is aimed at inspection/debug pages. A generic SQLite table detail page is the most direct proof that SQL/code blocks, badges, tabs, and debug JSON are useful together.
+
+### What worked
+
+- `scripts/001-uidsl-components-smoke.sh` passed.
+- The script also runs `go test ./...`, which passed.
+
+### What didn't work
+
+- N/A in this step.
+
+### What I learned
+
+- The generic browser example now exercises the real intended composition: schema summary + tabs + raw SQL + JSON debug payload.
+
+### What was tricky to build
+
+- The example currently uses query-string state globally for multiple tables on one page. This is good enough for a smoke example, but future table instances may need namespaced query params.
+
+### What warrants a second pair of eyes
+
+- Review the CSS-only tab styling. It uses the active class from server-rendered selected state and basic radio inputs for future CSS behavior; it is not a full accessible tab widget.
+
+### What should be done in the future
+
+- Consider adding `?tab=sql` links or form controls so selected tabs can be deep-linked more naturally.
+- Add a shared retro theme asset once static assets are formalized.
+
+### Code review instructions
+
+- Start with `examples/generic-browser/scripts/app.js` route `/tables/:name`.
+- Validate with:
+
+```bash
+ttmp/2026/05/07/DB-BROWSER-UIDSL-COMPONENTS--ui-dsl-component-spec-for-code-blocks-badges-and-tabs/scripts/001-uidsl-components-smoke.sh
+```
+
+### Technical details
+
+The smoke script verifies these markers in rendered HTML:
+
+```text
+ui-tabs
+ui-codeblock
+ui-badge
+Debug JSON
+CREATE TABLE people
+```

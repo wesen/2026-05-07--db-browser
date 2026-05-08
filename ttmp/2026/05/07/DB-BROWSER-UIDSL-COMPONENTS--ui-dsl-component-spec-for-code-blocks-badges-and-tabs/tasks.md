@@ -46,11 +46,11 @@
 
 ### T05 — Example integration
 
-- [ ] Update at least one example detail page to use `ui.badge`, `ui.sql`/`ui.codeBlock`, `ui.jsonBlock`, and `ui.tabs`.
-- [ ] Add/update retro CSS classes for code blocks, badges, and tabs.
-- [ ] Add a ticket-local serve/curl smoke script that checks rendered component classes.
-- [ ] Validate with Go tests and smoke script.
-- [ ] Commit example integration.
+- [x] Update at least one example detail page to use `ui.badge`, `ui.sql`/`ui.codeBlock`, `ui.jsonBlock`, and `ui.tabs`.
+- [x] Add/update retro CSS classes for code blocks, badges, and tabs.
+- [x] Add a ticket-local serve/curl smoke script that checks rendered component classes.
+- [x] Validate with Go tests and smoke script.
+- [x] Commit example integration.
 
 ### T06 — Documentation updates
 
