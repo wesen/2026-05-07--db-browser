@@ -1335,3 +1335,73 @@ Smoke script:
 ```bash
 ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/010-examples-smoke.sh
 ```
+
+## Step 17: Final validation and documentation refresh
+
+I refreshed the design document with the current implementation status, added a final validation script, ran the full validation chain, and prepared the ticket for a refreshed reMarkable upload. This closes the initial implementation batch from task planning through runnable examples.
+
+### Prompt Context
+
+**User prompt (verbatim):** "go ahead."
+
+**Assistant interpretation:** Finish the remaining documentation/validation task after completing the implementation and examples.
+
+**Inferred user intent:** Leave the ticket in a reviewable state with current docs, scripts, validation evidence, and a clean task checklist.
+
+**Commit (code):** pending — final documentation refresh.
+
+### What I did
+
+- Added an `Implementation status as of 2026-05-07` section to the design doc.
+- Added `scripts/011-final-validation.sh`.
+- Ran the final validation script, which executes:
+  - `go test ./...`;
+  - runtime smoke;
+  - rich table smoke;
+  - examples smoke;
+  - docmgr doctor.
+- Marked T10 complete in `tasks.md`.
+
+### Why
+
+- The design doc should reflect the actual implementation state and known deviations after the first coding pass.
+- A single final validation script is useful for reviewers and future continuation.
+
+### What worked
+
+- Final validation passed.
+- docmgr doctor passed.
+
+### What didn't work
+
+- N/A in this step.
+
+### What I learned
+
+- The initial vertical slice is now broad enough to demonstrate the intended architecture end-to-end: jsverbs CLI, yaml, SQLite, Express serve mode, and UI table rendering.
+
+### What was tricky to build
+
+- The main implementation caveats are now documented: filters/row actions are not done, table kind formatting is basic, and copied packages need future reconciliation.
+
+### What warrants a second pair of eyes
+
+- Review the implementation status section and confirm it accurately scopes what was built versus deferred.
+
+### What should be done in the future
+
+- Implement filters, row actions, saved views, CSV export, and richer formatting.
+- Decide whether to extract `internal/web` / `internal/uidsl` into shared packages.
+
+### Code review instructions
+
+- Run `ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/011-final-validation.sh`.
+- Review the commits from `f9ce54d` through the final documentation commit.
+
+### Technical details
+
+Final validation script:
+
+```bash
+ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/011-final-validation.sh
+```

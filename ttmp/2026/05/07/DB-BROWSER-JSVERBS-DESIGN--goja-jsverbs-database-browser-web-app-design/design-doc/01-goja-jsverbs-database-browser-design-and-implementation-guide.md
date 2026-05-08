@@ -841,6 +841,26 @@ Security tests:
 - **Merge all repositories into one synthetic jsverbs registry immediately.** Deferred because `Registry` internals are private; a slice of registries with host-side collision detection is less invasive.
 - **Mount dynamic verbs at CLI root.** Deferred because it increases collision risk with built-ins. A `verbs` namespace is clearer for v1.
 
+## Implementation status as of 2026-05-07
+
+The initial implementation now covers the first usable vertical slice of the design:
+
+- `db-browser verbs` lazily discovers repositories and mounts explicit `__verb__` JavaScript commands.
+- Verb repositories can come from the embedded built-in set, `.db-browser.yml`, `.db-browser.override.yml`, `DB_BROWSER_VERB_REPOSITORIES`, `--repository`, and `--verb-repository`.
+- CLI verbs execute in Goja with `fs`, `path`, `time`, `timer`, `yaml`, `ui.dsl`, and optional configured SQLite `database` / `db` aliases.
+- The Express/web host and low-level `ui.dsl` renderer were copied from `goja-hosting-site` into `internal/web` and `internal/uidsl`, then minimally adapted.
+- `db-browser serve` now opens SQLite, builds a Goja runtime with `express`, `ui.dsl`, `yaml`, `fs`, and `database` / `db`, loads scripts in sorted order, and serves registered routes.
+- `ui.table.fromRows` and `ui.table(id).data(...).columns(...).features(...).render(...)` are implemented as rich-table v1.
+- The v1 table DSL supports render context parsing, declared column kinds, sortable header links, pagination navigation, and deterministic row normalization across JS arrays and Go-returned slices.
+- Runnable examples exist in `examples/generic-browser` and `examples/yaml-dashboard`.
+
+Known deviations and follow-ups:
+
+- Filters, saved views, CSV export, row actions, and functional client-side column picker UI are not implemented yet.
+- Column kinds currently provide metadata and basic cell rendering; money/date/tags should receive stronger formatting later.
+- Empty `db.query` results from `go-go-goja/modules/database` can encode as `null` instead of `[]` because nil Go slices are preserved; decide whether to normalize this in a host wrapper.
+- The copied `internal/web` and `internal/uidsl` packages should eventually either become shared packages or be periodically reconciled with `goja-hosting-site`.
+
 ## Risks and open questions
 
 - **Runtime concurrency:** `web.Host` routes calls through a runtime owner, which likely serializes access. Long DB queries can block all requests. Consider per-request runtimes or a worker pool later.

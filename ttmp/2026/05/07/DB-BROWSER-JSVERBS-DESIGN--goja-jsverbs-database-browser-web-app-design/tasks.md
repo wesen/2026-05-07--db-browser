@@ -83,11 +83,11 @@
 
 ### T10 — Documentation refresh and reMarkable update
 
-- [ ] Update design doc with implementation notes and any deviations.
-- [ ] Update diary with chronological commits and validation evidence.
-- [ ] Run `docmgr doctor --ticket DB-BROWSER-JSVERBS-DESIGN --stale-after 30`.
-- [ ] Upload refreshed bundle to reMarkable if requested.
-- [ ] Commit final documentation refresh.
+- [x] Update design doc with implementation notes and any deviations.
+- [x] Update diary with chronological commits and validation evidence.
+- [x] Run `docmgr doctor --ticket DB-BROWSER-JSVERBS-DESIGN --stale-after 30`.
+- [x] Upload refreshed bundle to reMarkable if requested.
+- [x] Commit final documentation refresh.
 
 ## Completed research/design tasks
 
