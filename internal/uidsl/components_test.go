@@ -107,6 +107,7 @@ func TestTabsRenderSelectedDuplicateDisabledAndEscaped(t *testing.T) {
 	], { selected: "json", class: "extra" })`)
 	for _, want := range []string{
 		`<div class="ui-tabs extra" id="record-tabs">`,
+		`#record-tabs-json:checked~.ui-tabs__panels>[data-tab="json"]{display:block;}`,
 		`<input class="ui-tabs__radio" id="record-tabs-summary" name="record-tabs" type="radio">`,
 		`<label class="ui-tabs__tab" for="record-tabs-summary">Summary &lt;x&gt;</label>`,
 		`<input checked class="ui-tabs__radio" id="record-tabs-json" name="record-tabs" type="radio">`,

@@ -78,6 +78,16 @@
 - [x] Update diary/changelog and validate ticket hygiene.
 - [x] Commit ticket copy and bookkeeping.
 
+### T10 — Fix CSS-only tab switching
+
+- [x] Diagnose why `ui.tabs` labels/radios did not switch SQL/Metadata panels in real apps.
+- [x] Move radio inputs to be direct siblings of the panels so CSS `:checked ~ .ui-tabs__panels` can work.
+- [x] Emit a per-instance component style block mapping each radio to its matching panel.
+- [x] Keep labels in a `ui-tabs__tablist` so visible tab clicks still check hidden radios.
+- [x] Add/adjust tests for emitted tab switching CSS.
+- [x] Validate with Go tests and Playwright label click.
+- [x] Commit the tab fix.
+
 ### T07 — Final validation and handoff
 
 - [x] Run `go test ./...`.

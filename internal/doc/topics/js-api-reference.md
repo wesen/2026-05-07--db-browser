@@ -493,7 +493,7 @@ The text is escaped and the value class is normalized.
 
 ### `ui.tabs(id, tabs, options?)`
 
-Renders a no-JavaScript multi-view detail component. The initial implementation uses CSS-friendly radio tab markup and also marks the selected panel with `ui-tabs__panel--active` for server-rendered themes.
+Renders a no-JavaScript multi-view detail component. The implementation uses CSS-friendly radio tab markup, emits a small per-instance style block that maps checked radios to panels, and also marks the initial selected panel with `ui-tabs__panel--active` for server-rendered themes.
 
 ```js
 ui.tabs("record-tabs", [

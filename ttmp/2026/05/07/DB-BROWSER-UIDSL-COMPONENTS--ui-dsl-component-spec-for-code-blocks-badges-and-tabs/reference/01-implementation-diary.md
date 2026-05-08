@@ -938,3 +938,119 @@ Copy command used:
 cp "/home/manuel/code/wesen/obsidian-vault/Projects/2026/05/08/ARTICLE - Server-Interactive ui.dsl - Backend-Dispatched UI Events.md" \
   "ttmp/2026/05/07/DB-BROWSER-UIDSL-COMPONENTS--ui-dsl-component-spec-for-code-blocks-badges-and-tabs/reference/02-server-interactive-ui-proposal.md"
 ```
+
+## Step 8: Fix CSS-only tabs so SQL/Metadata clicks switch panels
+
+I fixed the `ui.tabs` render structure after a real app showed that SQL/Metadata tabs could be clicked but did not switch visible panels. The root cause was structural: the radio inputs were rendered inside `.ui-tabs__tablist`, while `.ui-tabs__panels` was a sibling of the tablist. CSS selectors such as `input:checked ~ .ui-tabs__panels ...` cannot cross from a child input to the parent's sibling, so the browser could check the radio without changing panel visibility.
+
+The fix renders hidden radio inputs as direct children of the `.ui-tabs` container before both the tablist and panels. Visible labels remain in `.ui-tabs__tablist` and use `for=<radio-id>`, so clicking labels still checks the hidden radios. The component also emits a small per-instance style block that maps each checked radio to its corresponding panel.
+
+### Prompt Context
+
+**User prompt (verbatim):** "the table tabs SQL / Metadata don't work anymore       ui.tabs("schema-" + row.name, [
+        { id: "sql", label: "SQL", content: sqlBlock(row.sql, row.type + " " + row.name) },
+        { id: "metadata", label: "Metadata", content: jsonBlock(row, "sqlite_master row") },
+      ], { selected: "sql" })
+    )))
+
+
+I can't click on them. 
+
+The top function nav() {
+  return ui.div({ class: "top-tabs" },
+    ui.span(ui.a({ href: "/" }, "Overview")),
+    ui.span(ui.a({ href: "/conversation" }, "Conversation")),
+    ui.span(ui.a({ href: "/correlations" }, "Correlations")),
+    ui.span(ui.a({ href: "/delivery" }, "Delivery")),
+    ui.span(ui.a({ href: "/reasoning" }, "Reasoning")),
+    ui.span(ui.a({ href: "/tool-calls" }, "Tool Calls")),
+    ui.span(ui.a({ href: "/entities" }, "Entities")),
+    ui.span(ui.a({ href: "/schema" }, "Schema"))
+  ); 
+
+works. from /home/manuel/workspaces/2026-05-02/use-sessionstream-coinvault/2026-03-16--gec-rag/ttmp/2026/05/07/SQLITE-TRACE-VERBS--design-sqlite-trace-inspection-verbs/scripts/serve/trace_browser_app.js"
+
+**Assistant interpretation:** Diagnose and fix `ui.tabs` so CSS-only radio tabs switch panels in real applications, unlike the top nav links which work by normal navigation.
+
+**Inferred user intent:** Restore interactive SQL/Metadata tab switching without requiring custom client-side JavaScript in the trace browser app.
+
+**Commit (code):** pending — CSS-only tabs fix.
+
+### What I did
+
+- Changed `ui.tabs` markup in `internal/uidsl/components.go`:
+  - hidden radio inputs are now direct children of `.ui-tabs`;
+  - labels remain inside `.ui-tabs__tablist`;
+  - panels remain inside `.ui-tabs__panels`.
+- Added `tabsStyleNode(...)`, which emits component-owned CSS rules such as:
+
+```css
+#record-tabs-json:checked~.ui-tabs__panels>[data-tab="json"]{display:block;}
+```
+
+- Updated DOM token normalization so ids starting with digits are prefixed with `x-`, making generated CSS selectors easier to use.
+- Updated `internal/uidsl/components_test.go` to assert emitted tab-switching CSS.
+- Updated `internal/doc/topics/js-api-reference.md` to document the per-instance style behavior.
+- Added T10 to `tasks.md`.
+
+### Why
+
+- The previous structure looked reasonable in static HTML but could not work with CSS sibling selectors. CSS cannot select an uncle/aunt element: an input inside tablist cannot control a sibling of tablist.
+
+### What worked
+
+- `go test ./...` passed.
+- `scripts/001-uidsl-components-smoke.sh` passed.
+- Manual Playwright validation on the generic browser detail page worked:
+  - clicked `label[for="table-detail-tabs-sql"]`;
+  - checked radio changed to `table-detail-tabs-sql`;
+  - SQL panel computed style became `display: block`;
+  - Columns/Rows/Debug JSON panels computed style became `display: none`.
+
+### What didn't work
+
+- Clicking the hidden radio directly in Playwright timed out because the radio is intentionally positioned off-screen. This is expected; users click the visible label. I validated by clicking the label selector instead.
+
+### What I learned
+
+- CSS-only radio tabs require the controlling radio and the controlled panels to be siblings in a selector-compatible order, or they require generated CSS that can bridge the structure. We now do both: sibling order plus generated per-tab rules.
+
+### What was tricky to build
+
+- The component needs to work across app-specific CSS, not only the generic browser example. Emitting a tiny per-instance style block makes the switching behavior intrinsic to `ui.tabs` rather than relying on every app to write the correct generated selectors.
+
+### What warrants a second pair of eyes
+
+- Review whether embedding a per-instance `<style>` inside each tabs component is acceptable, or whether this should eventually move to a single generated stylesheet block on the page.
+
+### What should be done in the future
+
+- Consider adding a Playwright regression test for tabs once browser automation is formalized.
+- Consider adding ARIA attributes for active/disabled tab state.
+
+### Code review instructions
+
+- Review `tabsNode`, `tabInputNodes`, `tabLabelNodes`, and `tabsStyleNode` in `internal/uidsl/components.go`.
+- Validate with:
+
+```bash
+go test ./...
+ttmp/2026/05/07/DB-BROWSER-UIDSL-COMPONENTS--ui-dsl-component-spec-for-code-blocks-badges-and-tabs/scripts/001-uidsl-components-smoke.sh
+```
+
+### Technical details
+
+Working markup shape now:
+
+```html
+<div class="ui-tabs" id="schema-table">
+  <style class="ui-tabs__style">...</style>
+  <input class="ui-tabs__radio" id="schema-table-sql" ...>
+  <input class="ui-tabs__radio" id="schema-table-metadata" ...>
+  <div class="ui-tabs__tablist">
+    <label for="schema-table-sql">SQL</label>
+    <label for="schema-table-metadata">Metadata</label>
+  </div>
+  <div class="ui-tabs__panels">...</div>
+</div>
+```

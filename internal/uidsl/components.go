@@ -120,7 +120,9 @@ func tabsNode(id string, value goja.Value, opts map[string]any) (Node, error) {
 	if className := stringFromAny(opts["class"]); className != "" {
 		classes = append(classes, className)
 	}
-	children := []Node{&Element{Tag: "div", Attrs: map[string]any{"class": "ui-tabs__tablist", "role": "tablist"}, Children: tabControlNodes(baseID, tabs, selected)}}
+	children := []Node{tabsStyleNode(baseID, tabs)}
+	children = append(children, tabInputNodes(baseID, tabs, selected)...)
+	children = append(children, &Element{Tag: "div", Attrs: map[string]any{"class": "ui-tabs__tablist", "role": "tablist"}, Children: tabLabelNodes(baseID, tabs)})
 	panels := make([]Node, 0, len(tabs))
 	for i, tab := range tabs {
 		panelClasses := []any{"ui-tabs__panel"}
@@ -201,8 +203,8 @@ func selectedTabIndex(tabs []tabSpec, selected any) int {
 	return fallback
 }
 
-func tabControlNodes(baseID string, tabs []tabSpec, selected int) []Node {
-	children := make([]Node, 0, len(tabs)*2)
+func tabInputNodes(baseID string, tabs []tabSpec, selected int) []Node {
+	children := make([]Node, 0, len(tabs))
 	for i, tab := range tabs {
 		inputID := baseID + "-" + tab.ID
 		inputAttrs := map[string]any{"class": "ui-tabs__radio", "type": "radio", "name": baseID, "id": inputID}
@@ -212,16 +214,34 @@ func tabControlNodes(baseID string, tabs []tabSpec, selected int) []Node {
 		if tab.Disabled {
 			inputAttrs["disabled"] = true
 		}
+		children = append(children, &Element{Tag: "input", Attrs: inputAttrs})
+	}
+	return children
+}
+
+func tabLabelNodes(baseID string, tabs []tabSpec) []Node {
+	children := make([]Node, 0, len(tabs))
+	for _, tab := range tabs {
+		inputID := baseID + "-" + tab.ID
 		labelClasses := []any{"ui-tabs__tab"}
 		if tab.Disabled {
 			labelClasses = append(labelClasses, "ui-tabs__tab--disabled")
 		}
-		children = append(children,
-			&Element{Tag: "input", Attrs: inputAttrs},
-			&Element{Tag: "label", Attrs: map[string]any{"class": labelClasses, "for": inputID}, Children: []Node{&Text{Value: tab.Label}}},
-		)
+		children = append(children, &Element{Tag: "label", Attrs: map[string]any{"class": labelClasses, "for": inputID}, Children: []Node{&Text{Value: tab.Label}}})
 	}
 	return children
+}
+
+func tabsStyleNode(baseID string, tabs []tabSpec) Node {
+	var b strings.Builder
+	fmt.Fprintf(&b, "#%s>.ui-tabs__radio{position:absolute;left:-9999px;}\n", baseID)
+	fmt.Fprintf(&b, "#%s>.ui-tabs__panels>.ui-tabs__panel{display:none;}\n", baseID)
+	for _, tab := range tabs {
+		inputID := baseID + "-" + tab.ID
+		fmt.Fprintf(&b, "#%s:checked~.ui-tabs__panels>[data-tab=\"%s\"]{display:block;}\n", inputID, tab.ID)
+		fmt.Fprintf(&b, "#%s:checked~.ui-tabs__tablist>label[for=\"%s\"]{background:#fff;font-weight:900;}\n", inputID, inputID)
+	}
+	return &Element{Tag: "style", Attrs: map[string]any{"class": "ui-tabs__style"}, Children: []Node{&RawHTML{Value: b.String()}}}
 }
 
 func jsonBlockSource(value goja.Value) string {
@@ -455,6 +475,9 @@ func domToken(value string, fallback string) string {
 	token := cssToken(value)
 	if token == "empty" {
 		return fallback
+	}
+	if token[0] >= '0' && token[0] <= '9' {
+		return "x-" + token
 	}
 	return token
 }

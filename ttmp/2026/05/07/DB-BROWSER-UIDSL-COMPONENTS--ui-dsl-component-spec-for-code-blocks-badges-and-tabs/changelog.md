@@ -89,3 +89,16 @@ Added Obsidian research article and ticket copy for server-interactive ui.dsl ba
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-UIDSL-COMPONENTS--ui-dsl-component-spec-for-code-blocks-badges-and-tabs/reference/02-server-interactive-ui-proposal.md — Ticket copy of Obsidian research article
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-UIDSL-COMPONENTS--ui-dsl-component-spec-for-code-blocks-badges-and-tabs/tasks.md — Added T09 research article task
 
+
+## 2026-05-07
+
+Fixed CSS-only ui.tabs switching by making radios and panels siblings and emitting per-instance tab CSS.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/doc/topics/js-api-reference.md — Documented per-instance tab style behavior
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/uidsl/components.go — Tabs markup and generated CSS fix
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/uidsl/components_test.go — Tab switching CSS test expectation
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-UIDSL-COMPONENTS--ui-dsl-component-spec-for-code-blocks-badges-and-tabs/reference/01-implementation-diary.md — Diary step 8
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-UIDSL-COMPONENTS--ui-dsl-component-spec-for-code-blocks-badges-and-tabs/tasks.md — Added T10 tab fix task
+
