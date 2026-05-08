@@ -683,3 +683,86 @@ The key safety note added is:
 ```text
 Pass database/request text directly to ui.codeBlock, ui.sql, ui.js, or ui.jsonBlock. Do not wrap untrusted text in ui.raw.
 ```
+
+## Step 5: Final validation and handoff
+
+I ran the final validation chain for the component ticket and marked the implementation sequence complete. The core components, example integration, embedded documentation, smoke script, and ticket hygiene checks are all green.
+
+This closes the initial colleague-requested scope. The remaining items are explicitly future follow-ups: real copy behavior, richer line numbers, optional client-side keyboard support, and possible `ui.kv` summary helpers.
+
+### Prompt Context
+
+**User prompt (verbatim):** (same as Step 2)
+
+**Assistant interpretation:** Finish the step-by-step component implementation with final validation and handoff notes.
+
+**Inferred user intent:** Leave the ticket in a reviewable and resumable state after implementation.
+
+**Commit (code):** pending — final ticket docs.
+
+### What I did
+
+- Ran full test suite.
+- Ran the component smoke script.
+- Ran docmgr doctor for the new ticket.
+- Marked T07 complete in `tasks.md`.
+
+### Why
+
+- The ticket includes code, examples, docs, and smoke scripts. Final validation confirms those pieces work together.
+
+### What worked
+
+- `go test ./...` passed.
+- `scripts/001-uidsl-components-smoke.sh` passed.
+- `docmgr doctor --ticket DB-BROWSER-UIDSL-COMPONENTS --stale-after 30` passed.
+
+### What didn't work
+
+- N/A in this step.
+
+### What I learned
+
+- The new components fit cleanly into the existing `Node`/renderer model without requiring renderer changes.
+
+### What was tricky to build
+
+- The only subtle issues in the ticket were deterministic HTML expectations: JSON escaping and sorted boolean attributes. Both are now captured in tests.
+
+### What warrants a second pair of eyes
+
+- Review whether the CSS-only tabs should eventually include stronger ARIA semantics and keyboard behavior.
+- Review whether the generic browser example's tab/query interactions should be namespaced per table.
+
+### What should be done in the future
+
+- Implement real copy behavior when static JavaScript assets are available.
+- Add true line-number markup or CSS counters.
+- Add `ui.kv(...)` for summary/detail pages.
+- Add automated browser screenshots for the component example.
+
+### Code review instructions
+
+- Review commits in this order:
+  1. `Plan ui DSL inspection components`
+  2. `Add ui DSL inspection components`
+  3. `Use inspection components in generic browser`
+  4. `Document ui DSL inspection components`
+- Start code review with `internal/uidsl/components.go` and `internal/uidsl/components_test.go`.
+- Validate with:
+
+```bash
+go test ./...
+ttmp/2026/05/07/DB-BROWSER-UIDSL-COMPONENTS--ui-dsl-component-spec-for-code-blocks-badges-and-tabs/scripts/001-uidsl-components-smoke.sh
+docmgr doctor --ticket DB-BROWSER-UIDSL-COMPONENTS --stale-after 30
+```
+
+### Technical details
+
+Final validation commands run:
+
+```bash
+go test ./...
+ttmp/2026/05/07/DB-BROWSER-UIDSL-COMPONENTS--ui-dsl-component-spec-for-code-blocks-badges-and-tabs/scripts/001-uidsl-components-smoke.sh
+docmgr doctor --ticket DB-BROWSER-UIDSL-COMPONENTS --stale-after 30
+```

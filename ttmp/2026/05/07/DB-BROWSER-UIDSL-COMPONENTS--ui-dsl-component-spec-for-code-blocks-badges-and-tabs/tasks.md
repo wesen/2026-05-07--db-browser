@@ -62,11 +62,11 @@
 
 ### T07 — Final validation and handoff
 
-- [ ] Run `go test ./...`.
-- [ ] Run new component smoke scripts.
-- [ ] Run `docmgr doctor --ticket DB-BROWSER-UIDSL-COMPONENTS --stale-after 30`.
-- [ ] Update diary with final validation and review instructions.
-- [ ] Commit final ticket docs if needed.
+- [x] Run `go test ./...`.
+- [x] Run new component smoke scripts.
+- [x] Run `docmgr doctor --ticket DB-BROWSER-UIDSL-COMPONENTS --stale-after 30`.
+- [x] Update diary with final validation and review instructions.
+- [x] Commit final ticket docs if needed.
 
 ## Future follow-ups
 
