@@ -2161,3 +2161,97 @@ New example command:
 ```bash
 db-browser verbs list --fields path,repository,source,location --output table
 ```
+
+## Step 26: Add JavaScript API reference help page
+
+I added a comprehensive `js-api-reference` Glazed help page modeled after the API-reference style used in css-visual-diff and go-minitrace. It documents the actual JavaScript module surface exposed by `db-browser` across both served web app scripts and repository-scanned verbs.
+
+The reference is meant to be the canonical place to answer “what can my db-browser JavaScript code call?” It covers the runtime matrix, database API, Express-style routes, request/response objects, UI DSL tags, rich tables, YAML/filesystem/path modules, timer/time notes, JS verb declarations, and common safety/error patterns.
+
+### Prompt Context
+
+**User prompt (verbatim):** "add a js-api-reference document that covers all the api, like in css-visual-diff or go-minitrace"
+
+**Assistant interpretation:** Add an embedded Glazed help page named `js-api-reference` that provides a complete JavaScript API reference, similar to existing JS API docs in sibling projects.
+
+**Inferred user intent:** Make db-browser usable by developers and LLMs without reverse-engineering Go code or examples to discover the JavaScript API.
+
+**Commit (code):** pending — JS API reference docs.
+
+### What I did
+
+- Inspected the sibling JS API references:
+  - `../corporate-headquarters/go-minitrace/pkg/doc/js-api-reference.md`;
+  - `../corporate-headquarters/css-visual-diff/internal/cssvisualdiff/doc/topics/javascript-api.md`.
+- Added `internal/doc/topics/js-api-reference.md` with Glazed frontmatter.
+- Documented:
+  - runtime availability matrix for `serve` vs `verbs`;
+  - `require("db")` / `require("database")`;
+  - `require("express")`;
+  - request object fields;
+  - response methods;
+  - `require("ui.dsl")` / `require("ui")`;
+  - tag helpers;
+  - `ui.page`, `ui.fragment`, `ui.text`, `ui.raw`, `ui.render`;
+  - `ui.table.fromRows` and `ui.table(id)`;
+  - table builders, feature builders, column builders, filters, context, empty states;
+  - `yaml`, `fs`, `path`, `time`, `timer`;
+  - JS verb declarations with `__package__` and `__verb__`;
+  - error handling and safe generated-app rules.
+- Cross-linked `js-api-reference` from:
+  - `getting-started`;
+  - `user-guide`;
+  - `app-playbook`;
+  - `README.md`.
+- Added T16 to `tasks.md`.
+
+### Why
+
+- The current project had user-facing docs and an LLM app playbook, but no single complete API reference.
+- A dedicated API reference reduces ambiguity for both humans and generated code.
+
+### What worked
+
+- `go test ./...` passed.
+- `go run ./cmd/db-browser help js-api-reference` rendered successfully.
+- The rendered output includes the expected sections for `require("db")`, `require("express")`, `ui.table`, and JS verb declarations.
+
+### What didn't work
+
+- N/A in this step.
+
+### What I learned
+
+- The db-browser API reference needs to emphasize runtime availability because `express` exists only in `serve`, while `ui.dsl` and `db` can also exist in verbs depending on flags.
+
+### What was tricky to build
+
+- The main challenge was documenting implemented behavior without over-promising future work. For example, `date` currently renders text, `columnPicker` is a marker class, and dynamic `.data(ctx => ...)` tables must apply SQL filters themselves.
+
+### What warrants a second pair of eyes
+
+- Review whether the `time` module section should be expanded once the exact go-go-goja time API is documented locally.
+- Review whether `fs` should be described more conservatively before exposing apps beyond localhost.
+
+### What should be done in the future
+
+- Add automated help slug tests for `js-api-reference`.
+- Add a static API extraction smoke test if the JS module surface grows.
+
+### Code review instructions
+
+- Start with `internal/doc/topics/js-api-reference.md`.
+- Validate with:
+
+```bash
+go test ./...
+go run ./cmd/db-browser help js-api-reference
+```
+
+### Technical details
+
+The new help slug is:
+
+```bash
+db-browser help js-api-reference
+```

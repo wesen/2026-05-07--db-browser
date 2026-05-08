@@ -311,6 +311,7 @@ Prefer read-only apps unless the use case truly requires writes.
 ## See also
 
 - `db-browser help getting-started`
+- `db-browser help js-api-reference`
 - `db-browser help app-playbook`
 - `db-browser inspect modules`
 - `db-browser verbs list`

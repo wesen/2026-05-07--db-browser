@@ -131,7 +131,15 @@
 - [x] Add a top-level README with project overview, screenshot, quick start, examples, help docs, validation, and safety notes.
 - [x] Commit README and screenshot.
 
-### T16 — Browser automation follow-up
+### T16 — JavaScript API reference help page
+
+- [x] Add `js-api-reference` Glazed help entry covering serve and verbs runtimes.
+- [x] Document `db` / `database`, `express`, request/response objects, `ui.dsl`, rich tables, YAML, filesystem/path, timer/time, and JS verb declarations.
+- [x] Cross-link the reference from getting-started, user-guide, app-playbook, and README.
+- [x] Validate the embedded help page renders from the binary.
+- [x] Commit JavaScript API reference documentation.
+
+### T17 — Browser automation follow-up
 
 - [ ] Add an automated Playwright test runner or script that asserts browser behavior without manual steps.
 - [ ] Check for console errors after navigation and interactions.

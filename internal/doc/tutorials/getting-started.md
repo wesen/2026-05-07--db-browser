@@ -253,5 +253,6 @@ db-browser serve \
 ## See also
 
 - `db-browser help user-guide`
+- `db-browser help js-api-reference`
 - `db-browser help app-playbook`
 - `db-browser help`

@@ -297,3 +297,18 @@ Clarified default verb repository discovery in getting-started and app-playbook 
 - /home/manuel/code/wesen/2026-05-07--db-browser/internal/doc/tutorials/getting-started.md — Default built-in verb repository documentation
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 25
 
+
+## 2026-05-07
+
+Added embedded JavaScript API reference covering db-browser serve and verbs runtime modules.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-07--db-browser/README.md — Help command list includes JS API reference
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/doc/applications/app-playbook.md — Cross-link to JS API reference
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/doc/topics/js-api-reference.md — Complete JS API reference
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/doc/topics/user-guide.md — Cross-link to JS API reference
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/doc/tutorials/getting-started.md — Cross-link to JS API reference
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 26
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/tasks.md — Added T16 JS API reference task
+

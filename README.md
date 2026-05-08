@@ -125,10 +125,11 @@ The binary includes Glazed help entries:
 ```bash
 db-browser help getting-started
 db-browser help user-guide
+db-browser help js-api-reference
 db-browser help app-playbook
 ```
 
-Use `app-playbook` when handing db-browser to an LLM. It contains a full prompt template, expected file layout, app patterns, validation checklist, and common generated-code mistakes to reject.
+Use `js-api-reference` when you need the exact JavaScript module surface. Use `app-playbook` when handing db-browser to an LLM. It contains a full prompt template, expected file layout, app patterns, validation checklist, and common generated-code mistakes to reject.
 
 ## Validation scripts
 

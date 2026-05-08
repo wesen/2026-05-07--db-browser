@@ -468,5 +468,6 @@ This makes the generated app reviewable by both humans and coding agents.
 
 - `db-browser help getting-started`
 - `db-browser help user-guide`
+- `db-browser help js-api-reference`
 - `db-browser serve --help`
 - `db-browser inspect modules`
