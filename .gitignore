@@ -12,6 +12,7 @@ coverage.out
 *.db
 *.sqlite
 *.sqlite3
+!examples/playwright-smoke/data/app.db
 /tmp/
 
 # Editor/OS noise

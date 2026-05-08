@@ -1405,3 +1405,109 @@ Final validation script:
 ```bash
 ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/011-final-validation.sh
 ```
+
+## Step 18: Add seeded Playwright smoke app and test it in browser
+
+I added a tiny seeded SQLite database and a focused Playwright smoke app. I started the server locally, exercised the app in Playwright, verified the table and detail pages through accessibility snapshots, clicked a sortable header, and fixed the only browser-console error by adding a `/favicon.ico` route.
+
+### Prompt Context
+
+**User prompt (verbatim):** "once done, create a little seed db, and a little test app, and test in playwright."
+
+**Assistant interpretation:** Create a concrete SQLite fixture plus a small Express/ui.dsl app, run it through `db-browser serve`, and validate it with Playwright rather than only curl/unit tests.
+
+**Inferred user intent:** Prove that the implemented stack works in an actual browser with seeded data.
+
+**Commit (code):** pending — Playwright smoke app and evidence scripts.
+
+### What I did
+
+- Created `examples/playwright-smoke/data/app.db` with two tables:
+  - `customers`
+  - `orders`
+- Seeded customers:
+  - `Alice Example`
+  - `Bob Browser`
+  - `Carla Canvas`
+- Seeded orders for Alice and Bob.
+- Added `examples/playwright-smoke/scripts/app.js` using:
+  - `require("db")`;
+  - `require("express")`;
+  - `require("ui.dsl")`;
+  - `ui.table(...).data(...).columns(...).features(...).render(...)`.
+- Added routes:
+  - `/` customer summary table;
+  - `/customers/:id` customer detail and related orders;
+  - `/favicon.ico` 204.
+- Added `examples/playwright-smoke/README.md`.
+- Added `scripts/012-playwright-smoke.sh` for server smoke startup/fetch.
+- Added `scripts/013-playwright-checklist.md` with the exact manual Playwright checks performed.
+- Updated `.gitignore` to allow tracking the seeded `examples/playwright-smoke/data/app.db` despite the general `*.db` ignore.
+
+### Why
+
+- The previous tests validated HTTP and curl behavior, but the user explicitly requested a Playwright browser test.
+- A committed seed DB makes the app immediately runnable by reviewers.
+
+### What worked
+
+- `go test ./...` passed.
+- `scripts/012-playwright-smoke.sh` passed.
+- Playwright navigation to `/` showed:
+  - title `Playwright Smoke DB`;
+  - all seeded customers;
+  - order counts and totals.
+- Clicking the `Customer` sort header changed the URL to `/?dir=asc&page=1&sort=name`.
+- Playwright navigation to `/customers/1` showed:
+  - title `Alice Example`;
+  - segment `vip`;
+  - order rows with `shipped` and `paid`.
+- Current Playwright console check returned zero errors and warnings after the favicon fix.
+
+### What didn't work
+
+- The first browser navigation produced a console error:
+
+```text
+Failed to load resource: the server responded with a status of 404 (Not Found) @ http://127.0.0.1:19090/favicon.ico
+```
+
+- Fix: added `app.get("/favicon.ico", (req, res) => res.status(204).end());` to the smoke app and restarted the server.
+- I also initially used `pkill -f` with a pattern that could match the shell command itself. I avoided that pattern afterwards and used a saved PID file for the manually started server.
+
+### What I learned
+
+- The stack is browser-visible end-to-end now: SQLite seed data → go-go-goja DB module → Express route → ui.dsl rich table → rendered browser table.
+- Favicon handling is worth including in examples to keep Playwright console checks clean.
+
+### What was tricky to build
+
+- The main issue was process management for manual Playwright validation. The stable pattern is: build a temporary binary, start it in the background, save its PID, run browser checks, and kill that PID.
+
+### What warrants a second pair of eyes
+
+- Review whether committed SQLite binary fixtures are acceptable for this repo. If not, replace `app.db` with a seed script while keeping the same app.
+
+### What should be done in the future
+
+- Automate the Playwright browser checks in a Node/Playwright test if a JS test dependency is added to the repo.
+- Add links from customer rows to `/customers/:id` once row/cell link support is implemented.
+
+### Code review instructions
+
+- Start with `examples/playwright-smoke/scripts/app.js`.
+- Run `ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/012-playwright-smoke.sh`.
+- Follow `scripts/013-playwright-checklist.md` for manual browser validation.
+
+### Technical details
+
+Manual server command used for Playwright:
+
+```bash
+go build -o /tmp/db-browser-playwright ./cmd/db-browser
+/tmp/db-browser-playwright serve \
+  --db examples/playwright-smoke/data/app.db \
+  --scripts-dir examples/playwright-smoke/scripts \
+  --addr :19090 \
+  --dev
+```

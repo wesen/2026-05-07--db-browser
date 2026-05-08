@@ -187,3 +187,17 @@ Refreshed design documentation with implementation status and added final valida
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 17
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/011-final-validation.sh — Final validation script
 
+
+## 2026-05-07
+
+Added seeded Playwright smoke DB/app and validated it in browser.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-07--db-browser/examples/playwright-smoke/README.md — Run instructions for Playwright smoke app
+- /home/manuel/code/wesen/2026-05-07--db-browser/examples/playwright-smoke/data/app.db — Seed SQLite fixture for browser smoke app
+- /home/manuel/code/wesen/2026-05-07--db-browser/examples/playwright-smoke/scripts/app.js — Playwright smoke Express/ui.dsl app
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 18
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/012-playwright-smoke.sh — Server smoke script for Playwright app
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/013-playwright-checklist.md — Manual Playwright validation checklist
+
