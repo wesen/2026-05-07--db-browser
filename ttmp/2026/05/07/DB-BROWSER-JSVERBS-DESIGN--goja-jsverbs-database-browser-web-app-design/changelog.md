@@ -59,3 +59,16 @@ Implemented initial Go project skeleton and build smoke script.
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 7
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/002-build-skeleton.sh — Skeleton validation script
 
+
+## 2026-05-07
+
+Implemented verb repository bootstrap with embedded/config/env/CLI sources and tests.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/verbrepos/bootstrap.go — Repository bootstrap implementation
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/verbrepos/bootstrap_test.go — Bootstrap unit tests
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/verbrepos/builtin/hello.js — Embedded built-in verb fixture
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 8
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/003-bootstrap-tests.sh — Bootstrap validation script
+

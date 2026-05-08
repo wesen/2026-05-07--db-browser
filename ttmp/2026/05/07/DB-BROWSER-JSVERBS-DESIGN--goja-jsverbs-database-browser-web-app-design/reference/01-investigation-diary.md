@@ -591,3 +591,82 @@ yaml
 express
 ui.dsl
 ```
+
+## Step 8: Implement verb repository bootstrap
+
+I implemented the repository bootstrap package that discovers verb repositories from an embedded built-in set, local config files, the `DB_BROWSER_VERB_REPOSITORIES` environment variable, and leading CLI repository flags. This follows the css-visual-diff pattern while keeping the package independent of jsverbs scanning for now.
+
+### Prompt Context
+
+**User prompt (verbatim):** (same as Step 6)
+
+**Assistant interpretation:** Continue through the task list with T03, add tests, save validation scripts under the ticket, and prepare a focused commit.
+
+**Inferred user intent:** Build the dynamic repository foundation before mounting JavaScript verbs.
+
+**Commit (code):** pending — repository bootstrap implementation.
+
+### What I did
+
+- Added `internal/verbrepos/bootstrap.go`.
+- Added embedded built-in repository support via `//go:embed builtin/*.js`.
+- Added `internal/verbrepos/builtin/hello.js` as the embedded smoke verb source.
+- Added config loading for `.db-browser.yml` and `.db-browser.override.yml` with schema:
+  - `verbs.repositories[].name`
+  - `verbs.repositories[].path`
+  - `verbs.repositories[].enabled`
+- Added environment loading through `DB_BROWSER_VERB_REPOSITORIES` and `filepath.SplitList`.
+- Added early CLI parsing for leading `--repository` and `--verb-repository` flags.
+- Added `~`, relative path, absolute path, and directory validation in `NormalizeFilesystemRepositoryPath`.
+- Added identity-based dedupe so the same path from config and env only appears once.
+- Added unit tests in `internal/verbrepos/bootstrap_test.go`.
+- Added `scripts/003-bootstrap-tests.sh`.
+- Ran:
+  - `go get gopkg.in/yaml.v3@v3.0.1`
+  - `ttmp/.../scripts/003-bootstrap-tests.sh`
+
+### Why
+
+- Dynamic verbs have to be discovered before Cobra can parse the real verb command tree.
+- Keeping bootstrap separate from jsverbs scanning makes the code easier to test and mirrors css-visual-diff's proven shape.
+
+### What worked
+
+- Bootstrap tests passed:
+  - `ok github.com/go-go-golems/db-browser/internal/verbrepos`
+  - `? github.com/go-go-golems/db-browser/cmd/db-browser [no test files]`
+
+### What didn't work
+
+- N/A. The bootstrap package compiled and tests passed on the first validation run.
+
+### What I learned
+
+- The early CLI parser must stop at the first non-repository argument so dynamic verb flags named `--repository` are not accidentally consumed after the verb path begins.
+- Using an identity map lets config/env/CLI sources naturally preserve precedence while avoiding duplicate command roots.
+
+### What was tricky to build
+
+- The package needs enough config discovery to be useful but should not overreach before app-wide config decisions are final. I implemented local cwd/git-root config discovery and left system/XDG config layering for a later refinement if needed.
+
+### What warrants a second pair of eyes
+
+- Review whether `.db-browser.yml` lookup should include system/user/XDG app config layers like css-visual-diff and go-minitrace, or whether repo/cwd config is enough for this app.
+
+### What should be done in the future
+
+- T04 should scan each discovered repository and build the real lazy `verbs` command.
+
+### Code review instructions
+
+- Start with `internal/verbrepos/bootstrap.go`.
+- Review tests in `internal/verbrepos/bootstrap_test.go`.
+- Run `ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/003-bootstrap-tests.sh`.
+
+### Technical details
+
+Validation command:
+
+```bash
+ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/003-bootstrap-tests.sh
+```

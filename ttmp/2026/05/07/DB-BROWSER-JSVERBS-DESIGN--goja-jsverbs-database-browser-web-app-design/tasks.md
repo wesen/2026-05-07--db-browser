@@ -19,13 +19,13 @@
 
 ### T03 — Verb repository bootstrap
 
-- [ ] Implement repository source model: embedded, config, env, and CLI repositories.
-- [ ] Support `DB_BROWSER_VERB_REPOSITORIES` with `filepath.SplitList`.
-- [ ] Support leading `--repository` and `--verb-repository` flags before dynamic verb paths.
-- [ ] Support `.db-browser.yml` and `.db-browser.override.yml` with `verbs.repositories[]` entries.
-- [ ] Normalize `~`, relative paths, absolute paths, and duplicate repository identities.
-- [ ] Add unit tests for normalization and bootstrap ordering.
-- [ ] Commit repository bootstrap.
+- [x] Implement repository source model: embedded, config, env, and CLI repositories.
+- [x] Support `DB_BROWSER_VERB_REPOSITORIES` with `filepath.SplitList`.
+- [x] Support leading `--repository` and `--verb-repository` flags before dynamic verb paths.
+- [x] Support `.db-browser.yml` and `.db-browser.override.yml` with `verbs.repositories[]` entries.
+- [x] Normalize `~`, relative paths, absolute paths, and duplicate repository identities.
+- [x] Add unit tests for normalization and bootstrap ordering.
+- [x] Commit repository bootstrap.
 
 ### T04 — jsverbs scanning and dynamic CLI mounting
 
