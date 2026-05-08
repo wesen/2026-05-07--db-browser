@@ -400,6 +400,151 @@ const html = ui.render(ui.p("hello"));
 
 Most apps should use `res.html(...)` instead.
 
+## Inspection/debug components
+
+`ui.dsl` includes reusable server-rendered components for database inspection and debug pages. These components are safe for untrusted database/request text by default because they render values as escaped text nodes. Do not use `ui.raw` for SQL, JSON, scripts, request parameters, or other untrusted content.
+
+### `ui.codeBlock(language, source, options?)`
+
+Renders escaped code or preformatted text with stable classes for styling and future syntax highlighting.
+
+```js
+ui.codeBlock("sql", row.sql, {
+  title: row.name,
+  lineNumbers: true,
+  wrap: false,
+  copy: true,
+  maxHeight: "480px",
+});
+```
+
+Options:
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `title` | `string` | `""` | Optional caption title. |
+| `lineNumbers` | `boolean` | `false` | Adds `ui-codeblock--line-numbers`. Initial implementation is class/affordance only. |
+| `wrap` | `boolean` | `true` | Adds wrap/nowrap class. |
+| `copy` | `boolean` | `false` | Renders an inert `Copy` button affordance. |
+| `maxHeight` | `string` | `""` | Adds `max-height`/`overflow:auto` style to the `<pre>`. |
+| `class` | `string` | `""` | Additional class on the outer element. |
+
+Render shapes:
+
+```html
+<pre class="ui-codeblock ui-codeblock--sql ui-codeblock--wrap"><code class="language-sql">escaped source</code></pre>
+```
+
+or, when `title` or `copy` is set:
+
+```html
+<figure class="ui-codeblock ui-codeblock--sql ui-codeblock--nowrap ui-codeblock--line-numbers">
+  <figcaption class="ui-codeblock__caption">
+    <span class="ui-codeblock__title">customers</span>
+    <button class="ui-codeblock__copy" type="button">Copy</button>
+  </figcaption>
+  <pre class="ui-codeblock__pre"><code class="language-sql">escaped source</code></pre>
+</figure>
+```
+
+The language is normalized to a CSS-safe token. Empty/invalid language becomes `text`.
+
+### Convenience code block aliases
+
+```js
+ui.sql(source, options?)       // ui.codeBlock("sql", source, options)
+ui.js(source, options?)        // ui.codeBlock("javascript", source, options)
+ui.jsonBlock(value, options?)  // pretty JSON code block
+```
+
+`ui.jsonBlock` pretty-prints objects and arrays. If passed a valid JSON string, it parses and re-indents it. If the string is not valid JSON, it falls back to escaped plain text.
+
+```js
+ui.jsonBlock({ schema, columns, sampleRows }, {
+  title: "debug payload",
+  lineNumbers: true,
+});
+```
+
+### `ui.badge(value, options?)`
+
+Renders compact status/type labels outside tables.
+
+```js
+ui.badge(row.type, { tone: "info", title: "SQLite schema type" })
+ui.badge(row.ok ? "ok" : "error", { tone: row.ok ? "success" : "danger" })
+```
+
+Options:
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `tone` | `default | info | success | warning | danger | muted` | Unknown tones fall back to `default`. |
+| `title` | `string` | Optional title attribute. |
+| `class` | `string` | Additional CSS class. |
+
+Render shape:
+
+```html
+<span class="ui-badge ui-badge--success ui-badge--value-yes" title="...">yes</span>
+```
+
+The text is escaped and the value class is normalized.
+
+### `ui.tabs(id, tabs, options?)`
+
+Renders a no-JavaScript multi-view detail component. The initial implementation uses CSS-friendly radio tab markup and also marks the selected panel with `ui-tabs__panel--active` for server-rendered themes.
+
+```js
+ui.tabs("record-tabs", [
+  { id: "summary", label: "Summary", content: ui.table.fromRows("summary", rows).render({ query: req.query }) },
+  { id: "json", label: "Raw JSON", content: ui.jsonBlock(row.raw_json, { lineNumbers: true }) },
+  { id: "sql", label: "Schema SQL", content: ui.sql(row.sql) },
+], { selected: req.query.tab || "summary" })
+```
+
+Tab spec:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | Optional tab id. Normalized and suffixed if duplicated. |
+| `label` | `string` | Escaped tab label. |
+| `content` | `UiNode | UiNode[] | string` | Content normalized through the normal UI node path. |
+| `disabled` | `boolean` | Disabled tabs render disabled labels and cannot be selected. |
+
+Options:
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `selected` | `string | number` | Selected tab id or zero-based index. Invalid selection falls back to the first non-disabled tab. |
+| `class` | `string` | Additional class on the container. |
+
+Minimum classes:
+
+```text
+ui-tabs
+ui-tabs__radio
+ui-tabs__tablist
+ui-tabs__tab
+ui-tabs__tab--disabled
+ui-tabs__panels
+ui-tabs__panel
+ui-tabs__panel--active
+```
+
+Example schema/debug detail page:
+
+```js
+res.html(ui.page({ title: "Schema" },
+  ui.h1(row.name),
+  ui.badge(row.type),
+  ui.tabs("schema-tabs", [
+    { id: "sql", label: "SQL", content: ui.sql(row.sql, { title: row.name, lineNumbers: true, copy: true }) },
+    { id: "json", label: "Debug JSON", content: ui.jsonBlock(row, { lineNumbers: true }) },
+  ])
+));
+```
+
 ## `ui.table` rich table API
 
 The table API has two entry points.

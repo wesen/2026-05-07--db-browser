@@ -159,6 +159,36 @@ ui.style(ui.raw("body { font-family: system-ui; }"))
 
 Do not put user-provided content into `ui.raw`.
 
+## Inspection components
+
+Use inspection components when building schema browsers, record detail pages, and debug views. They render server-side and escape database/request text by default.
+
+```js
+res.html(ui.page({ title: "Schema" },
+  ui.h1(row.name),
+  ui.badge(row.type, { tone: row.type === "view" ? "info" : "muted" }),
+  ui.tabs("schema-tabs", [
+    {
+      id: "sql",
+      label: "SQL",
+      content: ui.sql(row.sql, {
+        title: row.name,
+        lineNumbers: true,
+        copy: true,
+        wrap: false,
+      }),
+    },
+    {
+      id: "json",
+      label: "Debug JSON",
+      content: ui.jsonBlock(row, { lineNumbers: true }),
+    },
+  ])
+));
+```
+
+Important safety rule: pass database/request text directly to `ui.codeBlock`, `ui.sql`, `ui.js`, or `ui.jsonBlock`. Do not wrap untrusted text in `ui.raw`.
+
 ## Table DSL
 
 The table DSL is the highest-level UI primitive in db-browser.

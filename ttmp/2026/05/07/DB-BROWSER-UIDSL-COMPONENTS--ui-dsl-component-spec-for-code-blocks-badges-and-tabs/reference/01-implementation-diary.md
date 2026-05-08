@@ -605,3 +605,81 @@ ui-badge
 Debug JSON
 CREATE TABLE people
 ```
+
+## Step 4: Document the new JavaScript API components
+
+I updated the embedded user-facing documentation so the newly implemented inspection components are discoverable from the binary. The JavaScript API reference now has a dedicated section for `ui.codeBlock`, `ui.sql`, `ui.js`, `ui.jsonBlock`, `ui.badge`, and `ui.tabs`, including signatures, options, render shapes, and safety notes.
+
+The user guide now includes a concise schema/debug page example that combines badges, tabs, SQL code blocks, and JSON debug output.
+
+### Prompt Context
+
+**User prompt (verbatim):** (same as Step 2)
+
+**Assistant interpretation:** Continue the component implementation sequence with documentation updates.
+
+**Inferred user intent:** Keep the public help docs in sync with the implemented JavaScript API.
+
+**Commit (code):** pending — component docs.
+
+### What I did
+
+- Updated `internal/doc/topics/js-api-reference.md` with a new `Inspection/debug components` section.
+- Documented:
+  - `ui.codeBlock(language, source, options?)`;
+  - `ui.sql(source, options?)`;
+  - `ui.js(source, options?)`;
+  - `ui.jsonBlock(value, options?)`;
+  - `ui.badge(value, options?)`;
+  - `ui.tabs(id, tabs, options?)`.
+- Added examples and safety notes about escaping and avoiding `ui.raw` for database/request text.
+- Updated `internal/doc/topics/user-guide.md` with a schema/debug page snippet.
+- Updated `README.md` to mention code blocks, badges, and tabs in the UI DSL summary.
+
+### Why
+
+- These are public JavaScript APIs. They need to be visible through `db-browser help js-api-reference` immediately after implementation.
+
+### What worked
+
+- `go test ./...` passed.
+- `go run ./cmd/db-browser help js-api-reference` rendered the new component sections.
+- `go run ./cmd/db-browser help user-guide` rendered the new inspection-components section.
+
+### What didn't work
+
+- N/A in this step.
+
+### What I learned
+
+- The JS API reference is now large enough that component sections should stay concise and example-heavy rather than duplicating every implementation detail from the ticket design doc.
+
+### What was tricky to build
+
+- The docs need to be precise about current behavior: copy buttons are inert, line numbers are currently an affordance/class, and tabs are server-rendered/CSS-friendly rather than a full client-side ARIA widget.
+
+### What warrants a second pair of eyes
+
+- Review whether the API reference should include the full HTML render contracts or keep the current shorter render shapes.
+
+### What should be done in the future
+
+- Add help-rendering tests that assert the new slug content includes `ui.codeBlock` and `ui.tabs`.
+
+### Code review instructions
+
+- Review `internal/doc/topics/js-api-reference.md` first.
+- Validate with:
+
+```bash
+go run ./cmd/db-browser help js-api-reference
+go run ./cmd/db-browser help user-guide
+```
+
+### Technical details
+
+The key safety note added is:
+
+```text
+Pass database/request text directly to ui.codeBlock, ui.sql, ui.js, or ui.jsonBlock. Do not wrap untrusted text in ui.raw.
+```

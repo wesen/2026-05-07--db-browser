@@ -11,7 +11,7 @@ The current UI direction is intentionally retro: monochrome Macintosh/System-1-i
 - Serves JavaScript web apps from a `scripts/` directory.
 - Opens a configured SQLite database and exposes it as `require("db")` / `require("database")`.
 - Provides an Express-style API through `require("express")`.
-- Provides `ui.dsl` for safe server-rendered HTML pages, forms, and tables.
+- Provides `ui.dsl` for safe server-rendered HTML pages, forms, tables, code blocks, badges, and tabs.
 - Supports rich tables with filters, pagination, sorting, badges, tags, money formatting, and cell links.
 - Supports YAML-backed dashboards through `require("yaml")`.
 - Scans JavaScript verb repositories and exposes explicit `__verb__` functions as CLI commands.

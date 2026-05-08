@@ -54,11 +54,11 @@
 
 ### T06 — Documentation updates
 
-- [ ] Update `db-browser help js-api-reference` with all new APIs and safety notes.
-- [ ] Update `db-browser help user-guide` with inspection/debug page examples.
-- [ ] Mention components in README if useful.
-- [ ] Validate embedded help rendering.
-- [ ] Commit documentation updates.
+- [x] Update `db-browser help js-api-reference` with all new APIs and safety notes.
+- [x] Update `db-browser help user-guide` with inspection/debug page examples.
+- [x] Mention components in README if useful.
+- [x] Validate embedded help rendering.
+- [x] Commit documentation updates.
 
 ### T07 — Final validation and handoff
 

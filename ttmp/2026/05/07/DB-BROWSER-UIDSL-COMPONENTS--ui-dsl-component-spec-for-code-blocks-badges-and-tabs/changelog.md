@@ -40,3 +40,16 @@ Integrated new ui.dsl components into the generic browser example and added a sm
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-UIDSL-COMPONENTS--ui-dsl-component-spec-for-code-blocks-badges-and-tabs/scripts/001-uidsl-components-smoke.sh — Component integration smoke validation
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-UIDSL-COMPONENTS--ui-dsl-component-spec-for-code-blocks-badges-and-tabs/tasks.md — Marked T05 complete
 
+
+## 2026-05-07
+
+Documented new ui.dsl inspection components in embedded help and README.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-07--db-browser/README.md — UI DSL feature summary includes components
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/doc/topics/js-api-reference.md — Full component API reference
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/doc/topics/user-guide.md — Inspection component usage example
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-UIDSL-COMPONENTS--ui-dsl-component-spec-for-code-blocks-badges-and-tabs/reference/01-implementation-diary.md — Diary step 4
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-UIDSL-COMPONENTS--ui-dsl-component-spec-for-code-blocks-badges-and-tabs/tasks.md — Marked T06 complete
+
