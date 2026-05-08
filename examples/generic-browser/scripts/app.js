@@ -49,7 +49,7 @@ app.get("/", (req, res) => {
     ),
     ui.table.fromRows("tables", tables)
       .columns(c => c
-        .text("name").label("Table").sortable().filterable()
+        .text("name").label("Table").sortable().filterable().link(row => "/tables/" + encodeURIComponent(row.name))
         .text("column_count").label("Columns").align("right").sortable()
       )
       .features(f => f.filters().pagination({ size: 25 }).sorting().columnPicker())

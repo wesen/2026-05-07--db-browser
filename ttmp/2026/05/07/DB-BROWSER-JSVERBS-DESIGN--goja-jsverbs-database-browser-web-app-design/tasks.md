@@ -106,7 +106,15 @@
 - [x] Validate with curl, Go tests, and Playwright.
 - [x] Commit the themed examples.
 
-### T13 — Browser automation follow-up
+### T13 — Row/cell links for richer examples
+
+- [x] Implement `column.link(row => href)` for table cells.
+- [x] Implement `column.link("/path/{field}")` template links.
+- [x] Add unit tests for function and template links.
+- [x] Use links in the Playwright smoke customer table and generic browser table list.
+- [x] Commit link support.
+
+### T14 — Browser automation follow-up
 
 - [ ] Add an automated Playwright test runner or script that asserts browser behavior without manual steps.
 - [ ] Check for console errors after navigation and interactions.

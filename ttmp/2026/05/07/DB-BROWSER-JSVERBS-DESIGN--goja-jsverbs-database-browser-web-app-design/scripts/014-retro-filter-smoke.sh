@@ -21,6 +21,7 @@ done
 
 grep -q 'macos-desktop' /tmp/db-browser-retro-filter-vip.html
 grep -q 'Alice Example' /tmp/db-browser-retro-filter-vip.html
+grep -q '/customers/1' /tmp/db-browser-retro-filter-vip.html
 ! grep -q 'Bob Browser' /tmp/db-browser-retro-filter-vip.html
 ! grep -q 'Carla Canvas' /tmp/db-browser-retro-filter-vip.html
 grep -q 'Page 1 of 1 (1 rows)' /tmp/db-browser-retro-filter-vip.html

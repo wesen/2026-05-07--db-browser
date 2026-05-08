@@ -34,6 +34,8 @@ type ColumnSpec struct {
 	Sortable   bool
 	Filterable bool
 	Align      string
+	LinkHref   string
+	LinkFn     goja.Callable
 }
 
 type RenderContext struct {
@@ -114,7 +116,7 @@ func (t *TableBuilder) render(vm *goja.Runtime, input map[string]any) (Node, err
 			rows = paginateRows(rows, ctx)
 		}
 	}
-	return t.node(ctx, rows, total, columns), nil
+	return t.node(vm, ctx, rows, total, columns), nil
 }
 
 func (t *TableBuilder) context(input map[string]any) RenderContext {
@@ -174,7 +176,7 @@ func (t *TableBuilder) resolveColumns(vm *goja.Runtime, ctx RenderContext, rows 
 	return cols, nil
 }
 
-func (t *TableBuilder) node(ctx RenderContext, rows []map[string]any, total int, columns []ColumnSpec) Node {
+func (t *TableBuilder) node(vm *goja.Runtime, ctx RenderContext, rows []map[string]any, total int, columns []ColumnSpec) Node {
 	headCells := make([]Node, 0, len(columns))
 	for _, column := range columns {
 		label := column.Label
@@ -199,7 +201,7 @@ func (t *TableBuilder) node(ctx RenderContext, rows []map[string]any, total int,
 			if column.Align != "" {
 				attrs["class"] = "align-" + column.Align
 			}
-			cells = append(cells, &Element{Tag: "td", Attrs: attrs, Children: []Node{cellNode(row[column.Name], column)}})
+			cells = append(cells, &Element{Tag: "td", Attrs: attrs, Children: []Node{cellNode(vm, row, row[column.Name], column)}})
 		}
 		bodyRows = append(bodyRows, &Element{Tag: "tr", Children: cells})
 	}
@@ -267,7 +269,14 @@ func columnObject(vm *goja.Runtime, col *ColumnSpec, columns *[]ColumnSpec) goja
 	_ = obj.Set("align", func(align string) goja.Value { col.Align = align; return obj })
 	_ = obj.Set("mono", func(_ ...any) goja.Value { return obj })
 	_ = obj.Set("truncate", func(_ ...any) goja.Value { return obj })
-	_ = obj.Set("link", func(_ ...any) goja.Value { return obj })
+	_ = obj.Set("link", func(target goja.Value) goja.Value {
+		if fn, ok := goja.AssertFunction(target); ok {
+			col.LinkFn = fn
+		} else if !goja.IsUndefined(target) && !goja.IsNull(target) {
+			col.LinkHref = fmt.Sprint(target.Export())
+		}
+		return obj
+	})
 	for _, kind := range []string{"text", "badge", "money", "date", "tags"} {
 		kind := kind
 		_ = obj.Set(kind, func(name string, _ ...map[string]any) goja.Value {
@@ -419,11 +428,12 @@ func paginationNode(ctx RenderContext, total int) Node {
 	return &Element{Tag: "nav", Attrs: map[string]any{"class": "ui-table-pagination"}, Children: children}
 }
 
-func cellNode(value any, col ColumnSpec) Node {
+func cellNode(vm *goja.Runtime, row map[string]any, value any, col ColumnSpec) Node {
 	text := formatCell(value, col)
+	var child Node
 	switch col.Kind {
 	case "badge":
-		return &Element{Tag: "span", Attrs: map[string]any{"class": []any{"ui-badge", "ui-badge--" + cssToken(text)}}, Children: []Node{&Text{Value: text}}}
+		child = &Element{Tag: "span", Attrs: map[string]any{"class": []any{"ui-badge", "ui-badge--" + cssToken(text)}}, Children: []Node{&Text{Value: text}}}
 	case "tags":
 		parts := splitTags(value)
 		children := make([]Node, 0, len(parts))
@@ -433,10 +443,32 @@ func cellNode(value any, col ColumnSpec) Node {
 			}
 			children = append(children, &Element{Tag: "span", Attrs: map[string]any{"class": []any{"ui-tag", "ui-tag--" + cssToken(part)}}, Children: []Node{&Text{Value: part}}})
 		}
-		return &Fragment{Children: children}
+		child = &Fragment{Children: children}
 	default:
-		return &Text{Value: text}
+		child = &Text{Value: text}
 	}
+	if href := linkHref(vm, row, value, col); href != "" {
+		return &Element{Tag: "a", Attrs: map[string]any{"href": href}, Children: []Node{child}}
+	}
+	return child
+}
+
+func linkHref(vm *goja.Runtime, row map[string]any, value any, col ColumnSpec) string {
+	if col.LinkFn != nil {
+		ret, err := col.LinkFn(goja.Undefined(), vm.ToValue(row), vm.ToValue(value))
+		if err != nil || goja.IsUndefined(ret) || goja.IsNull(ret) {
+			return ""
+		}
+		return fmt.Sprint(ret.Export())
+	}
+	if col.LinkHref == "" {
+		return ""
+	}
+	href := col.LinkHref
+	for key, value := range row {
+		href = strings.ReplaceAll(href, "{"+key+"}", url.QueryEscape(fmt.Sprint(value)))
+	}
+	return href
 }
 
 func formatCell(value any, col ColumnSpec) string {

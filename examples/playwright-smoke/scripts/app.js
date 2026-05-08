@@ -101,7 +101,7 @@ app.get("/", (req, res) => {
     ui.table.fromRows("customers", rows)
       .columns(c => c
         .text("id").label("ID").sortable()
-        .text("name").label("Customer").sortable().filterable()
+        .text("name").label("Customer").sortable().filterable().link(row => "/customers/" + row.id)
         .badge("segment").label("Segment").filterable()
         .text("email").label("Email").filterable()
         .text("order_count").label("Orders").align("right").sortable()

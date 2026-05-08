@@ -1709,3 +1709,78 @@ and form submission to:
 ```text
 ?q=bob&filter.name=&filter.segment=vip&filter.email=&filter.tags=
 ```
+
+## Step 21: Add table cell links for richer examples
+
+I added the table link support that the examples needed to feel like navigable browser apps. Columns can now wrap cell content in anchors either by calling a JavaScript link function with `(row, value)` or by using a simple string template with `{field}` placeholders.
+
+This closes the most visible gap in the retro examples: the customer and table names now point to their detail pages instead of being inert table text.
+
+### Prompt Context
+
+**User prompt (verbatim):** "continue"
+
+**Assistant interpretation:** Continue the current implementation batch after retro styling and filter validation.
+
+**Inferred user intent:** Keep advancing the richer DB browser prototype and make sensible focused commits along the way.
+
+**Commit (code):** pending — table cell links.
+
+### What I did
+
+- Added `ColumnSpec.LinkFn` and `ColumnSpec.LinkHref`.
+- Implemented `column.link(row => href)` for dynamic links.
+- Implemented `column.link("/path/{field}")` for simple template links.
+- Wrapped rendered cell nodes in `<a href="...">` when a link is configured.
+- Added unit tests in `internal/uidsl/table_links_test.go`.
+- Updated the Playwright smoke customer table to link customer names to `/customers/:id`.
+- Updated the generic browser table list to link table names to `/tables/:name`.
+- Updated the retro smoke script to verify the customer link is present.
+
+### Why
+
+- Navigating from overview tables to detail pages is core DB-browser behavior.
+- The prior `.link()` column method was a placeholder no-op, which made the examples less useful.
+
+### What worked
+
+- `go test ./internal/uidsl -count=1` passed.
+- `go test ./...` passed.
+- `scripts/014-retro-filter-smoke.sh` passed.
+- `scripts/012-playwright-smoke.sh` passed.
+
+### What didn't work
+
+- No code failure in this step.
+
+### What I learned
+
+- The Goja callable path is flexible enough for app authors, while the string-template path is useful for simple hand-authored examples and LLM-generated apps.
+
+### What was tricky to build
+
+- Link rendering had to preserve existing badge/tag/text rendering and escaping. The implementation builds the inner cell node first, then conditionally wraps it in an anchor so all existing cell kinds keep working.
+
+### What warrants a second pair of eyes
+
+- Template placeholders currently use `url.QueryEscape`, which is safe but encodes spaces as `+`. For path segments, `%20` may be preferable later.
+
+### What should be done in the future
+
+- Add a dedicated path-segment escaping helper for template links.
+- Consider supporting link objects such as `{ href, target, title }`.
+
+### Code review instructions
+
+- Start with `internal/uidsl/table.go`, especially `columnObject`, `cellNode`, and `linkHref`.
+- Review `internal/uidsl/table_links_test.go` for the intended JS API.
+- Validate with `go test ./...`.
+
+### Technical details
+
+Supported link examples:
+
+```js
+c.text("name").link(row => "/customers/" + row.id)
+c.text("name").link("/tables/{name}")
+```

@@ -230,3 +230,17 @@ Added retro Macintosh-style CSS examples, richer demo screens, and filter smoke 
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/013-playwright-checklist.md — Retro Playwright validation notes
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/014-retro-filter-smoke.sh — Retro filter smoke script
 
+
+## 2026-05-07
+
+Added table cell link support and wired overview rows to detail pages.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-07--db-browser/examples/generic-browser/scripts/app.js — Table links to detail pages
+- /home/manuel/code/wesen/2026-05-07--db-browser/examples/playwright-smoke/scripts/app.js — Customer links to detail pages
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/uidsl/table.go — Column link rendering
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/uidsl/table_links_test.go — Link behavior tests
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 21
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/014-retro-filter-smoke.sh — Link presence validation
+
