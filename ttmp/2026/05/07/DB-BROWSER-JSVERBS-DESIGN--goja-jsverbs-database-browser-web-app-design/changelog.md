@@ -163,3 +163,16 @@ Expanded ui.table into rich DSL v1 and added generic browser smoke example.
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 15
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/009-rich-table-tests.sh — Rich table smoke validation script
 
+
+## 2026-05-07
+
+Added generic browser and YAML dashboard examples with smoke validation.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-07--db-browser/examples/generic-browser/scripts/app.js — Generic browser example
+- /home/manuel/code/wesen/2026-05-07--db-browser/examples/yaml-dashboard/dashboard.yaml — YAML dashboard spec
+- /home/manuel/code/wesen/2026-05-07--db-browser/examples/yaml-dashboard/scripts/app.js — YAML dashboard serve example
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/reference/01-investigation-diary.md — Diary step 16
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/010-examples-smoke.sh — Examples smoke validation script
+

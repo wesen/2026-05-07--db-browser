@@ -1267,3 +1267,71 @@ Generic browser smoke command is encoded in:
 ```bash
 ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/009-rich-table-tests.sh
 ```
+
+## Step 16: Add runnable examples and smoke validation
+
+I added the remaining example coverage from T09: a YAML-backed dashboard app that exercises `require("yaml")` in serve mode, plus a combined example smoke script that builds the binary, creates temporary SQLite databases, starts the example servers, fetches pages, and verifies expected content.
+
+### Prompt Context
+
+**User prompt (verbatim):** "go ahead."
+
+**Assistant interpretation:** Continue after rich table DSL work into examples and validation scripts.
+
+**Inferred user intent:** Provide runnable examples that demonstrate the app's intended authoring model, not just unit tests.
+
+**Commit (code):** pending — examples and smoke scripts.
+
+### What I did
+
+- Added `examples/yaml-dashboard/dashboard.yaml`.
+- Added `examples/yaml-dashboard/scripts/app.js`.
+- Added `examples/yaml-dashboard/README.md`.
+- Added `scripts/010-examples-smoke.sh`.
+- The smoke script validates:
+  - `go test ./...`;
+  - generic browser example renders the `people` table;
+  - YAML dashboard example renders `YAML Dashboard`, the `People` metric, and value `2`.
+
+### Why
+
+- The design called out YAML as a useful module for dashboard packs and app manifests. The YAML dashboard proves that path in the hosted Express runtime.
+- A script that starts real servers catches integration issues that unit tests can miss.
+
+### What worked
+
+- `scripts/010-examples-smoke.sh` passed.
+- Both example apps can run via `db-browser serve`.
+
+### What didn't work
+
+- N/A in this step.
+
+### What I learned
+
+- The current serve runtime is sufficient for simple DB/browser apps that combine `express`, `db`, `fs`, `path`, `yaml`, and `ui.dsl`.
+
+### What was tricky to build
+
+- The smoke script needs to manage two short-lived HTTP servers. It builds a temporary binary once and uses per-port log/html files to keep failures inspectable.
+
+### What warrants a second pair of eyes
+
+- Review whether the YAML dashboard's config file path should be relative to the script directory instead of repository root. It currently uses `examples/yaml-dashboard/dashboard.yaml` explicitly.
+
+### What should be done in the future
+
+- Add richer example datasets and screenshots once filters/row actions are implemented.
+
+### Code review instructions
+
+- Start with `examples/yaml-dashboard/scripts/app.js`.
+- Run `ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/010-examples-smoke.sh`.
+
+### Technical details
+
+Smoke script:
+
+```bash
+ttmp/2026/05/07/DB-BROWSER-JSVERBS-DESIGN--goja-jsverbs-database-browser-web-app-design/scripts/010-examples-smoke.sh
+```

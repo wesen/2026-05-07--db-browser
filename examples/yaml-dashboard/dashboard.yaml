@@ -1,0 +1,12 @@
+title: YAML Dashboard
+metrics:
+  - label: Tables
+    sql: |
+      SELECT COUNT(*) AS value
+      FROM sqlite_schema
+      WHERE type = 'table'
+        AND name NOT LIKE 'sqlite_%'
+  - label: People
+    sql: |
+      SELECT COUNT(*) AS value
+      FROM people

@@ -76,10 +76,10 @@
 
 ### T09 — Examples and validation scripts
 
-- [ ] Add `examples/generic-browser` with a small SQLite fixture or fixture setup script.
-- [ ] Add `examples/yaml-dashboard` to exercise `require("yaml")`.
-- [ ] Add ticket-local scripts for build/test/smoke validation.
-- [ ] Commit examples and validation scripts.
+- [x] Add `examples/generic-browser` with a small SQLite fixture or fixture setup script.
+- [x] Add `examples/yaml-dashboard` to exercise `require("yaml")`.
+- [x] Add ticket-local scripts for build/test/smoke validation.
+- [x] Commit examples and validation scripts.
 
 ### T10 — Documentation refresh and reMarkable update
 
