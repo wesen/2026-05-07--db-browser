@@ -36,7 +36,8 @@ func TestCodeBlockEscapesSimplePre(t *testing.T) {
 	html := renderJS(t, `ui.codeBlock("sql!!", "SELECT '<x>'")`)
 	for _, want := range []string{
 		`<pre class="ui-codeblock ui-codeblock--sql ui-codeblock--wrap">`,
-		`<code class="language-sql">SELECT &#39;&lt;x&gt;&#39;</code>`,
+		`<span class="ui-codeblock__token ui-codeblock__token--keyword">SELECT</span>`,
+		`<span class="ui-codeblock__token ui-codeblock__token--string">&#39;&lt;x&gt;&#39;</span>`,
 	} {
 		if !strings.Contains(html, want) {
 			t.Fatalf("missing %q in %s", want, html)
@@ -69,8 +70,9 @@ func TestCodeBlockAliasesAndJSON(t *testing.T) {
 	for _, want := range []string{
 		`ui-codeblock--sql`,
 		`language-javascript`,
-		`&#34;a&#34;: &#34;\u003cx\u003e&#34;`,
-		`&#34;z&#34;: 1`,
+		`<span class="ui-codeblock__token ui-codeblock__token--key">&#34;a&#34;</span>`,
+		`<span class="ui-codeblock__token ui-codeblock__token--string">&#34;\u003cx\u003e&#34;</span>`,
+		`<span class="ui-codeblock__token ui-codeblock__token--number">1</span>`,
 	} {
 		if !strings.Contains(html, want) {
 			t.Fatalf("missing %q in %s", want, html)

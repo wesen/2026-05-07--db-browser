@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"github.com/dop251/goja"
 )
@@ -49,7 +50,8 @@ func codeBlockNode(language string, source any, opts map[string]any) Node {
 	if options.MaxHeight != "" {
 		preAttrs["style"] = map[string]any{"max-height": options.MaxHeight, "overflow": "auto"}
 	}
-	code := &Element{Tag: "code", Attrs: map[string]any{"class": "language-" + lang}, Children: []Node{&Text{Value: stringifySource(source)}}}
+	sourceText := stringifySource(source)
+	code := &Element{Tag: "code", Attrs: map[string]any{"class": "language-" + lang}, Children: highlightCode(lang, sourceText)}
 	if options.Title == "" && !options.Copy {
 		preAttrs["class"] = classes
 		return &Element{Tag: "pre", Attrs: preAttrs, Children: []Node{code}}
@@ -241,6 +243,192 @@ func jsonBlockSource(value goja.Value) string {
 	}
 	return stringifySource(exported)
 }
+
+func highlightCode(language string, source string) []Node {
+	switch language {
+	case "sql":
+		return highlightSQLLike(source, sqlKeywords(), true)
+	case "javascript", "js":
+		return highlightSQLLike(source, jsKeywords(), false)
+	case "json":
+		return highlightJSON(source)
+	default:
+		return []Node{&Text{Value: source}}
+	}
+}
+
+func highlightSQLLike(source string, keywords map[string]bool, sql bool) []Node {
+	nodes := []Node{}
+	for i := 0; i < len(source); {
+		if sql && i+1 < len(source) && source[i] == '-' && source[i+1] == '-' {
+			j := i + 2
+			for j < len(source) && source[j] != '\n' {
+				j++
+			}
+			nodes = append(nodes, tokenNode("comment", source[i:j]))
+			i = j
+			continue
+		}
+		if !sql && i+1 < len(source) && source[i] == '/' && source[i+1] == '/' {
+			j := i + 2
+			for j < len(source) && source[j] != '\n' {
+				j++
+			}
+			nodes = append(nodes, tokenNode("comment", source[i:j]))
+			i = j
+			continue
+		}
+		if i+1 < len(source) && source[i] == '/' && source[i+1] == '*' {
+			j := i + 2
+			for j+1 < len(source) && !(source[j] == '*' && source[j+1] == '/') {
+				j++
+			}
+			if j+1 < len(source) {
+				j += 2
+			}
+			nodes = append(nodes, tokenNode("comment", source[i:j]))
+			i = j
+			continue
+		}
+		if source[i] == '\'' || source[i] == '"' || (!sql && source[i] == '`') {
+			j := scanString(source, i)
+			nodes = append(nodes, tokenNode("string", source[i:j]))
+			i = j
+			continue
+		}
+		if isDigit(source[i]) {
+			j := i + 1
+			for j < len(source) && (isDigit(source[j]) || source[j] == '.') {
+				j++
+			}
+			nodes = append(nodes, tokenNode("number", source[i:j]))
+			i = j
+			continue
+		}
+		if isIdentStart(source[i]) {
+			j := i + 1
+			for j < len(source) && isIdentPart(source[j]) {
+				j++
+			}
+			word := source[i:j]
+			lower := strings.ToLower(word)
+			if keywords[lower] {
+				nodes = append(nodes, tokenNode("keyword", word))
+			} else if !sql && (lower == "true" || lower == "false" || lower == "null" || lower == "undefined") {
+				nodes = append(nodes, tokenNode("literal", word))
+			} else {
+				nodes = append(nodes, &Text{Value: word})
+			}
+			i = j
+			continue
+		}
+		nodes = append(nodes, &Text{Value: source[i : i+1]})
+		i++
+	}
+	return coalesceText(nodes)
+}
+
+func highlightJSON(source string) []Node {
+	nodes := []Node{}
+	for i := 0; i < len(source); {
+		if source[i] == '"' {
+			j := scanString(source, i)
+			kind := "string"
+			k := j
+			for k < len(source) && unicode.IsSpace(rune(source[k])) {
+				k++
+			}
+			if k < len(source) && source[k] == ':' {
+				kind = "key"
+			}
+			nodes = append(nodes, tokenNode(kind, source[i:j]))
+			i = j
+			continue
+		}
+		if isDigit(source[i]) || source[i] == '-' {
+			j := i + 1
+			for j < len(source) && (isDigit(source[j]) || strings.ContainsRune(".eE+-", rune(source[j]))) {
+				j++
+			}
+			nodes = append(nodes, tokenNode("number", source[i:j]))
+			i = j
+			continue
+		}
+		matched := false
+		for _, literal := range []string{"true", "false", "null"} {
+			if strings.HasPrefix(source[i:], literal) {
+				nodes = append(nodes, tokenNode("literal", literal))
+				i += len(literal)
+				matched = true
+				break
+			}
+		}
+		if matched {
+			continue
+		}
+		nodes = append(nodes, &Text{Value: source[i : i+1]})
+		i++
+	}
+	return coalesceText(nodes)
+}
+
+func tokenNode(kind string, text string) Node {
+	return &Element{Tag: "span", Attrs: map[string]any{"class": []any{"ui-codeblock__token", "ui-codeblock__token--" + kind}}, Children: []Node{&Text{Value: text}}}
+}
+
+func scanString(source string, i int) int {
+	quote := source[i]
+	j := i + 1
+	for j < len(source) {
+		if source[j] == '\\' {
+			j += 2
+			continue
+		}
+		if source[j] == quote {
+			return j + 1
+		}
+		j++
+	}
+	return j
+}
+
+func coalesceText(nodes []Node) []Node {
+	out := []Node{}
+	for _, n := range nodes {
+		if text, ok := n.(*Text); ok {
+			if len(out) > 0 {
+				if prev, ok := out[len(out)-1].(*Text); ok {
+					prev.Value += text.Value
+					continue
+				}
+			}
+		}
+		out = append(out, n)
+	}
+	return out
+}
+
+func sqlKeywords() map[string]bool {
+	return keywordSet("select from where join left right inner outer on as create table view index trigger insert update delete values into primary key references not null integer text real blob autoincrement case when then else end exists and or order by group having limit offset union all distinct count sum min max coalesce")
+}
+
+func jsKeywords() map[string]bool {
+	return keywordSet("const let var function return if else for while do switch case break continue try catch finally throw new class extends import export require async await in of typeof instanceof")
+}
+
+func keywordSet(words string) map[string]bool {
+	ret := map[string]bool{}
+	for _, word := range strings.Fields(words) {
+		ret[word] = true
+	}
+	return ret
+}
+
+func isDigit(b byte) bool { return b >= '0' && b <= '9' }
+func isIdentStart(b byte) bool {
+	return (b >= 'A' && b <= 'Z') || (b >= 'a' && b <= 'z') || b == '_'
+}
+func isIdentPart(b byte) bool { return isIdentStart(b) || isDigit(b) || b == '$' }
 
 func stringifySource(value any) string {
 	if value == nil {

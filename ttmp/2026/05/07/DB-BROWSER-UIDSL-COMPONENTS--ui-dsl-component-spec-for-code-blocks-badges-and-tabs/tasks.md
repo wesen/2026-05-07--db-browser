@@ -60,6 +60,15 @@
 - [x] Validate embedded help rendering.
 - [x] Commit documentation updates.
 
+### T08 — Syntax highlighting and closer trace-browser styling
+
+- [x] Add safe server-side token highlighting for SQL, JSON, and JavaScript code blocks.
+- [x] Render highlighted tokens as escaped span-wrapped UI nodes, not raw HTML.
+- [x] Add/adjust tests for keyword/string/key/number highlighting.
+- [x] Update the generic browser CSS toward the supplied classic Macintosh trace-browser reference.
+- [x] Validate with Go tests, smoke script, and a Playwright visual check.
+- [x] Commit syntax highlighting and styling update.
+
 ### T07 — Final validation and handoff
 
 - [x] Run `go test ./...`.

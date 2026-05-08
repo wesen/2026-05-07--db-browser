@@ -64,3 +64,17 @@ Completed final validation and handoff for ui.dsl inspection components.
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-UIDSL-COMPONENTS--ui-dsl-component-spec-for-code-blocks-badges-and-tabs/scripts/001-uidsl-components-smoke.sh — Final smoke validation script
 - /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-UIDSL-COMPONENTS--ui-dsl-component-spec-for-code-blocks-badges-and-tabs/tasks.md — Final task completion state
 
+
+## 2026-05-07
+
+Added safe code block syntax highlighting and updated generic browser CSS toward the supplied Macintosh trace-browser reference.
+
+### Related Files
+
+- /home/manuel/code/wesen/2026-05-07--db-browser/examples/generic-browser/scripts/app.js — Reference-inspired classic Mac CSS shell
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/doc/topics/js-api-reference.md — Code block highlighting documentation
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/uidsl/components.go — Safe SQL/JSON/JS token highlighting
+- /home/manuel/code/wesen/2026-05-07--db-browser/internal/uidsl/components_test.go — Highlighting test expectations
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-UIDSL-COMPONENTS--ui-dsl-component-spec-for-code-blocks-badges-and-tabs/reference/01-implementation-diary.md — Diary step 6
+- /home/manuel/code/wesen/2026-05-07--db-browser/ttmp/2026/05/07/DB-BROWSER-UIDSL-COMPONENTS--ui-dsl-component-spec-for-code-blocks-badges-and-tabs/tasks.md — Added T08 highlighting/styling task
+

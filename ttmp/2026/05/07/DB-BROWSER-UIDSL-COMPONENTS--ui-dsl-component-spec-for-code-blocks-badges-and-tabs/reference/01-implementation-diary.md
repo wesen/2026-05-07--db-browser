@@ -766,3 +766,92 @@ go test ./...
 ttmp/2026/05/07/DB-BROWSER-UIDSL-COMPONENTS--ui-dsl-component-spec-for-code-blocks-badges-and-tabs/scripts/001-uidsl-components-smoke.sh
 docmgr doctor --ticket DB-BROWSER-UIDSL-COMPONENTS --stale-after 30
 ```
+
+## Step 6: Add syntax highlighting and closer Macintosh trace-browser styling
+
+I added lightweight server-side syntax highlighting to code blocks and moved the generic browser styling closer to the supplied reference screenshot. The highlighter keeps the original safety guarantee: it does not emit raw HTML from source text. Instead it tokenizes SQL, JSON, and JavaScript into `Text` nodes wrapped by span elements with token classes.
+
+I also updated the generic browser shell to more closely resemble the screenshot: top system menu bar, striped classic window titlebar, centered title, hero/header region, pill-like navigation tabs, boxed metric cards, crisp black borders, dense tables, and monochrome code blocks with muted token colors.
+
+### Prompt Context
+
+**User prompt (verbatim):** "can we add syntax highlighting to the codeblocks? and make the CSS more like this? /tmp/pi-clipboard-4321c668-91e4-40bf-a89f-01e13646d799.png"
+
+**Assistant interpretation:** Extend `ui.codeBlock` with safe syntax highlighting and update the example/theme CSS to match the provided classic Macintosh-style SQLite trace browser screenshot more closely.
+
+**Inferred user intent:** Improve visual usability and make code/SQL/JSON blocks easier to inspect while preserving server-rendered safety.
+
+**Commit (code):** pending — codeblock highlighting and reference-inspired CSS.
+
+### What I did
+
+- Added safe token highlighting in `internal/uidsl/components.go` for:
+  - SQL;
+  - JSON;
+  - JavaScript.
+- Added token span classes:
+  - `ui-codeblock__token--keyword`;
+  - `ui-codeblock__token--string`;
+  - `ui-codeblock__token--number`;
+  - `ui-codeblock__token--comment`;
+  - `ui-codeblock__token--key`;
+  - `ui-codeblock__token--literal`.
+- Updated `internal/uidsl/components_test.go` to assert highlighted spans and continued escaping.
+- Reworked `examples/generic-browser/scripts/app.js` CSS and page shell to more closely match the provided reference image.
+- Updated `internal/doc/topics/js-api-reference.md` to mention lightweight highlighting and token classes.
+- Added T08 to `tasks.md`.
+- Ran a Playwright visual check against `/tables/backend_pipeline?tab=sql` and confirmed the updated shell/code block rendered correctly.
+
+### Why
+
+- Code blocks are primarily for SQL/JSON/debug text. Highlighting makes them materially easier to scan.
+- The supplied image establishes a sharper visual target than the earlier retro style: more classic Mac chrome, stronger black outlines, striped titlebar, top menu, and dense inspection layout.
+
+### What worked
+
+- `go test ./...` passed.
+- `scripts/001-uidsl-components-smoke.sh` passed.
+- `docmgr doctor --ticket DB-BROWSER-UIDSL-COMPONENTS --stale-after 30` passed.
+- Playwright screenshot check showed SQL keywords/string-ish content highlighted and the page shell closer to the reference.
+
+### What didn't work
+
+- N/A in this step.
+
+### What I learned
+
+- We can add useful highlighting without breaking the no-raw-HTML guarantee by representing each token as normal UI nodes.
+
+### What was tricky to build
+
+- The highlighter needed to stay deliberately small. It is not a full parser; it recognizes common comments, strings, numbers, literals, keys, and keyword tokens. The safety invariant matters more than perfect highlighting.
+
+### What warrants a second pair of eyes
+
+- Review whether SQL keywords should preserve case while using case-insensitive matching. They currently do.
+- Review the classic-Mac visual balance against the reference image; it is closer, but not pixel-perfect.
+
+### What should be done in the future
+
+- Consider extracting the retro CSS into a shared theme asset/module.
+- Add more SQL keywords if real schemas show gaps.
+- Consider a formal tokenizer package only if highlighting complexity grows.
+
+### Code review instructions
+
+- Review `internal/uidsl/components.go`, especially `highlightCode`, `highlightSQLLike`, and `highlightJSON`.
+- Review `examples/generic-browser/scripts/app.js` for CSS and page-shell changes.
+- Validate with:
+
+```bash
+go test ./...
+ttmp/2026/05/07/DB-BROWSER-UIDSL-COMPONENTS--ui-dsl-component-spec-for-code-blocks-badges-and-tabs/scripts/001-uidsl-components-smoke.sh
+```
+
+### Technical details
+
+Highlighting remains escaped because every token is rendered as:
+
+```go
+&Element{Tag: "span", Attrs: ..., Children: []Node{&Text{Value: tokenText}}}
+```

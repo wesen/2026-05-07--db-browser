@@ -406,7 +406,7 @@ Most apps should use `res.html(...)` instead.
 
 ### `ui.codeBlock(language, source, options?)`
 
-Renders escaped code or preformatted text with stable classes for styling and future syntax highlighting.
+Renders escaped code or preformatted text with stable classes and lightweight server-side token highlighting for SQL, JSON, and JavaScript.
 
 ```js
 ui.codeBlock("sql", row.sql, {
@@ -447,7 +447,7 @@ or, when `title` or `copy` is set:
 </figure>
 ```
 
-The language is normalized to a CSS-safe token. Empty/invalid language becomes `text`.
+The language is normalized to a CSS-safe token. Empty/invalid language becomes `text`. Highlighted tokens render as escaped `<span>` nodes with classes such as `ui-codeblock__token--keyword`, `ui-codeblock__token--string`, `ui-codeblock__token--number`, `ui-codeblock__token--comment`, `ui-codeblock__token--key`, and `ui-codeblock__token--literal`.
 
 ### Convenience code block aliases
 
