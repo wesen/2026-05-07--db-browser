@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-go test ./internal/uidsl -run 'Test.*(CodeBlock|Badge|Tabs)' -count=1
+go test github.com/go-go-golems/go-go-goja/modules/uidsl -run 'Test.*(CodeBlock|Badge|Tabs)' -count=1
 go test ./...
 
 BIN="$(mktemp /tmp/db-browser-uidsl-components-bin-XXXXXX)"

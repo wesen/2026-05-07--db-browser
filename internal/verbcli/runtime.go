@@ -10,10 +10,9 @@ import (
 	"github.com/go-go-golems/glazed/pkg/cmds/values"
 	"github.com/go-go-golems/go-go-goja/engine"
 	databasemod "github.com/go-go-golems/go-go-goja/modules/database"
+	"github.com/go-go-golems/go-go-goja/modules/uidsl"
 	"github.com/go-go-golems/go-go-goja/pkg/jsverbs"
 	_ "github.com/mattn/go-sqlite3"
-
-	"github.com/go-go-golems/db-browser/internal/uidsl"
 )
 
 type RuntimeSettings struct {

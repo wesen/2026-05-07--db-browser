@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-gofmt -w internal/uidsl/*.go internal/app/*.go cmd/db-browser/main.go
-go test ./internal/uidsl ./internal/app ./cmd/db-browser
+gofmt -w internal/app/*.go cmd/db-browser/main.go
+go test github.com/go-go-golems/go-go-goja/modules/uidsl ./internal/app ./cmd/db-browser
 
 DB_PATH="$(mktemp /tmp/db-browser-rich-table-XXXX.sqlite)"
 BIN="$(mktemp /tmp/db-browser-bin-XXXXXX)"
@@ -30,5 +30,5 @@ for _ in $(seq 1 30); do
   sleep 0.2
 done
 grep -q 'Generic SQLite Browser' /tmp/db-browser-rich-table.html
-grep -q '<table class="ui-table ui-table--pagination ui-table--sorting ui-table--column-picker" id="tables">' /tmp/db-browser-rich-table.html
+grep -q '<table class="ui-table ui-table--pagination ui-table--sorting ui-table--column-picker ui-table--filters" id="tables">' /tmp/db-browser-rich-table.html
 grep -q 'people' /tmp/db-browser-rich-table.html

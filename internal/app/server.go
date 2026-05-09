@@ -15,10 +15,10 @@ import (
 	"github.com/dop251/goja"
 	"github.com/go-go-golems/go-go-goja/engine"
 	databasemod "github.com/go-go-golems/go-go-goja/modules/database"
+	expressmod "github.com/go-go-golems/go-go-goja/modules/express"
+	"github.com/go-go-golems/go-go-goja/modules/uidsl"
+	"github.com/go-go-golems/go-go-goja/pkg/gojahttp"
 	_ "github.com/mattn/go-sqlite3"
-
-	"github.com/go-go-golems/db-browser/internal/uidsl"
-	"github.com/go-go-golems/db-browser/internal/web"
 )
 
 type Config struct {
@@ -34,7 +34,7 @@ type Server struct {
 	cfg     Config
 	db      *sql.DB
 	runtime *engine.Runtime
-	host    *web.Host
+	host    *gojahttp.Host
 	httpSrv *http.Server
 }
 
@@ -66,7 +66,7 @@ func NewServer(ctx context.Context, cfg Config) (*Server, error) {
 		return nil, fmt.Errorf("ping sqlite database: %w", err)
 	}
 
-	host := web.NewHost(web.HostOptions{Dev: cfg.Dev, Renderer: uidsl.RenderAny})
+	host := gojahttp.NewHost(gojahttp.HostOptions{Dev: cfg.Dev, Renderer: uidsl.RenderAny})
 	guarded := &guardedDB{db: db, allowWrites: cfg.AllowWrites && !cfg.ReadOnly}
 	databaseModule := databasemod.New(databasemod.WithPreconfiguredDB(guarded), databasemod.WithConfigureEnabled(false))
 	dbAliasModule := databasemod.New(databasemod.WithName("db"), databasemod.WithPreconfiguredDB(guarded), databasemod.WithConfigureEnabled(false))
@@ -77,7 +77,7 @@ func NewServer(ctx context.Context, cfg Config) (*Server, error) {
 			engine.NativeModuleSpec{ModuleID: "database:configured", ModuleName: databaseModule.Name(), Loader: databaseModule.Loader},
 			engine.NativeModuleSpec{ModuleID: "database:db-alias", ModuleName: dbAliasModule.Name(), Loader: dbAliasModule.Loader},
 		).
-		WithRuntimeModuleRegistrars(web.NewExpressRegistrar(host), uidsl.NewRegistrar()).
+		WithRuntimeModuleRegistrars(expressmod.NewRegistrar(host), uidsl.NewRegistrar()).
 		Build()
 	if err != nil {
 		_ = db.Close()
